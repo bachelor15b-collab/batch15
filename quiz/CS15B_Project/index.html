@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Batch15 Challenges</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f8fafc;color:#1e293b;min-height:100vh}
+a{text-decoration:none;color:#2563eb}
+
+/* Nav */
+.navbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 16px;position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center}
+.navbar-inner{max-width:1200px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between}
+.navbar-brand{font-size:1.15rem;font-weight:700;color:#2563eb;display:flex;align-items:center;gap:6px}
+.navbar-back{font-size:.85rem;color:#64748b;cursor:pointer;border:none;background:#e2e8f0;padding:6px 12px;border-radius:6px;display:flex;align-items:center;gap:4px}
+.navbar-back:hover{background:#cbd5e1}
+
+/* Hero - Background Slideshow */
+.hero{position:relative;overflow:hidden;text-align:center;padding:80px 20px 70px;color:#fff;min-height:480px;display:flex;align-items:center;justify-content:center}
+.hero-bg-slides{position:absolute;inset:0;z-index:0}
+.hero-bg-slides{position:absolute;inset:0;z-index:0}
+.hero-bg-slide{position:absolute;inset:0;background-size:cover;background-position:center;background-blend-mode:overlay;opacity:0;transition:opacity 1.2s ease}
+.hero-bg-slide.active{opacity:1}
+.hero-bg-slide:nth-child(1){background:linear-gradient(135deg,#0f172a,#1e3a5f),url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1600&q=80')}
+.hero-bg-slide:nth-child(2){background:linear-gradient(135deg,#1a0a2e,#16213e),url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1600&q=80')}
+.hero-bg-slide:nth-child(3){background:linear-gradient(135deg,#0b0c10,#1f2833),url('https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1600&q=80')}
+.hero-bg-slide:nth-child(4){background:linear-gradient(135deg,#1a1a2e,#16213e),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80')}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.6),rgba(0,0,0,.4) 50%,rgba(0,0,0,.7));z-index:1}
+.hero-content{position:relative;z-index:2;max-width:800px}
+.hero h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:800;margin-bottom:12px}
+.hero h1 span{color:#f59e0b}
+.hero p{font-size:clamp(.9rem,2vw,1.1rem);margin-bottom:24px;max-width:650px;margin-left:auto;margin-right:auto;opacity:.9}
+.hero-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 32px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(37,99,235,.4)}
+.hero-btn:hover{background:#1d4ed8}
+.hero-stats{display:flex;justify-content:center;gap:32px;margin-top:40px;flex-wrap:wrap;opacity:0;transform:translateY(30px);animation:heroFadeIn .8s .5s forwards}
+.hero-stat{text-align:center}
+.hero-stat-num{font-size:1.5rem;font-weight:700;color:#f59e0b}
+.hero-stat-label{font-size:.8rem;opacity:.8;margin-top:2px}
+@keyframes heroFadeIn{to{opacity:1;transform:translateY(0)}}
+
+/* Scroll Reveal */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Container */
+.container{max-width:1200px;margin:0 auto;padding:16px}
+
+/* Section */
+.section{padding:30px 0}
+.section-header{text-align:center;margin-bottom:24px}
+.section-header h2{font-size:1.5rem;margin-bottom:6px}
+.section-header p{color:#64748b;font-size:.9rem}
+
+/* Skills Grid */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.skill-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px 12px;text-align:center;cursor:pointer;transition:.2s}
+.skill-card:hover{border-color:#2563eb;box-shadow:0 2px 8px rgba(0,0,0,.1);transform:translateY(-2px)}
+.skill-card-icon{font-size:1.8rem;margin-bottom:6px;display:flex;align-items:center;justify-content:center}
+.skill-card-icon svg{width:28px;height:28px}
+.challenge-header .badge svg{width:18px;height:18px;vertical-align:middle}
+#pregameIcon svg{width:48px;height:48px}
+.skill-card-name{font-size:.82rem;font-weight:600;color:#1e293b}
+.skill-card.locked{opacity:.5;cursor:not-allowed}
+.skill-card.locked:hover{transform:none;border-color:#e2e8f0}
+
+/* Search */
+.search-input{width:100%;max-width:380px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;margin:0 auto 16px;display:block;outline:none}
+.search-input:focus{border-color:#2563eb}
+
+/* Challenges */
+.challenge-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.challenge-header h2{font-size:1.3rem}
+.challenge-header .badge{background:#2563eb;color:#fff;padding:4px 12px;border-radius:20px;font-size:.82rem;display:inline-flex;align-items:center;gap:6px}
+.challenges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.challenge-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;cursor:pointer;transition:.2s}
+.challenge-card:hover{border-color:#2563eb;box-shadow:0 2px 8px rgba(0,0,0,.1);transform:translateY(-2px)}
+.challenge-card .cc-icon{width:32px;height:32px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;margin-right:10px;vertical-align:middle}
+.challenge-card .cc-icon svg{width:28px;height:28px}
+.challenge-card .cc-head{display:flex;align-items:center;margin-bottom:6px}
+.challenge-card h3{font-size:1rem;margin:0}
+.challenge-card p{font-size:.85rem;color:#64748b;margin-bottom:12px}
+.challenge-card .meta{display:flex;gap:12px;font-size:.78rem;color:#64748b;flex-wrap:wrap}
+.challenge-card .meta span{display:inline-flex;align-items:center}
+
+/* Timer */
+.timer-box{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:16px;text-align:center}
+.timer-box .label{font-size:.78rem;color:#64748b}
+.timer-box .time{font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums}
+.timer-box .time.warn{color:#f59e0b}
+.timer-box .time.danger{color:#ef4444;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.5}}
+
+/* Progress */
+.progress-bar{background:#e2e8f0;border-radius:8px;height:6px;margin-bottom:16px;overflow:hidden}
+.progress-fill{height:100%;background:#2563eb;border-radius:8px;transition:width .3s;width:0}
+
+/* Question */
+.question-area{padding:16px 0}
+.question-box{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:24px;margin-bottom:16px}
+.q-num{font-size:.82rem;color:#64748b;margin-bottom:8px}
+.q-type{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.75rem;font-weight:600;margin-bottom:12px}
+.q-type.mcq{background:#dbeafe;color:#1d4ed8}
+.q-type.tf{background:#fef3c7;color:#b45309}
+.q-text{font-size:1.05rem;font-weight:600;margin-bottom:16px;line-height:1.5}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:.92rem;transition:.2s}
+.option:hover{border-color:#2563eb;background:#f0f5ff}
+.option input[type=radio]{width:16px;height:16px;accent-color:#2563eb;cursor:pointer}
+.option .letter{width:24px;height:24px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:600;flex-shrink:0}
+.option.selected{border-color:#2563eb;background:#dbeafe}
+.option.selected .letter{background:#2563eb;color:#fff}
+
+/* Nav Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border:none;border-radius:8px;font-size:.88rem;font-weight:500;cursor:pointer;transition:.2s}
+.btn-p{background:#2563eb;color:#fff}
+.btn-p:hover{background:#1d4ed8}
+.btn-s{background:#e2e8f0;color:#1e293b}
+.btn-s:hover{background:#cbd5e1}
+.btn-g{background:#10b981;color:#fff}
+.btn-g:hover{background:#059669}
+.btn-r{background:#ef4444;color:#fff}
+.btn-r:hover{background:#dc2626}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Overflow */
+.page{display:none}
+.page.active{display:block}
+
+/* Modal */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:12px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-header{padding:20px 24px 12px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-size:1.2rem}
+.modal-close{width:30px;height:30px;border:none;background:#e2e8f0;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:12px 24px 20px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+#certModal .modal{max-width:680px}
+
+/* Results Grid */
+.r-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.r-item{background:#f8fafc;border-radius:8px;padding:14px;text-align:center}
+.r-item .val{font-size:1.5rem;font-weight:700}
+.r-item .lbl{font-size:.78rem;color:#64748b;margin-top:2px}
+.r-item.ok .val{color:#10b981}
+.r-item.no .val{color:#ef4444}
+.r-item.pct .val{color:#2563eb}
+.r-item.grd .val{color:#f59e0b}
+.r-status{text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:1rem}
+.r-status.pass{background:#d1fae5;color:#065f46}
+.r-status.fail{background:#fee2e2;color:#991b1b}
+
+/* Certificate - Luxury Premium Design */
+.cert-area{text-align:center;padding:24px 28px;position:relative;margin:8px auto;max-width:700px;background:#fff;border-radius:4px}
+.cert-area-inner{border:3px solid #D4AF37;padding:28px 32px;position:relative;background:#fff}
+.cert-area-inner::before{content:'';position:absolute;top:7px;left:7px;right:7px;bottom:7px;border:1px solid #D4AF37;pointer-events:none}
+.cert-corner{position:absolute;width:28px;height:28px;border-color:#D4AF37;border-style:solid}
+.cert-corner.tl{top:9px;left:9px;border-width:3px 0 0 3px}
+.cert-corner.tr{top:9px;right:9px;border-width:3px 3px 0 0}
+.cert-corner.bl{bottom:9px;left:9px;border-width:0 0 3px 3px}
+.cert-corner.br{bottom:9px;right:9px;border-width:0 3px 3px 0}
+.cert-ribbon{background:linear-gradient(135deg,#D4AF37,#e8c84a,#D4AF37);color:#111;padding:5px 22px;display:inline-block;font-weight:700;font-size:.88rem;letter-spacing:3px;margin-bottom:20px;text-transform:uppercase;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.cert-title{font-size:1.5rem;font-weight:900;color:#111;letter-spacing:2px;margin-bottom:2px;font-family:Georgia,'Times New Roman',serif}
+.cert-sub{font-size:1rem;color:#D4AF37;font-weight:700;margin-bottom:18px;letter-spacing:1px;font-family:Georgia,'Times New Roman',serif}
+.cert-award-badge{font-size:2.6rem;margin-bottom:8px;display:inline-block}
+.cert-name{font-size:1.9rem;font-weight:700;color:#111;font-family:Georgia,'Times New Roman',serif;font-style:italic;margin-bottom:8px}
+.cert-detail{font-size:.88rem;color:#555;margin-bottom:4px;font-family:Georgia,'Times New Roman',serif}
+.cert-detail strong{color:#111}
+.cert-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:22px;border-top:1px solid #D4AF37;gap:10px;flex-wrap:wrap}
+.cert-bottom-item{flex:1;text-align:center;font-size:.8rem;color:#555;min-width:120px}
+.cert-bottom-item .label{font-size:.7rem;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.cert-bottom-item .value{font-weight:700;color:#111;font-size:.85rem;font-family:Georgia,'Times New Roman',serif}
+.cert-bottom-item .sig{font-family:'Brush Script MT','Segoe Script','Comic Sans MS',cursive;font-size:1.5rem;color:#111;font-weight:400}
+.cert-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14rem;color:rgba(212,175,55,.07);pointer-events:none;font-family:Georgia,serif;z-index:0;line-height:1;user-select:none}
+.cert-code{text-align:center;margin-top:10px;font-size:.68rem;color:#aaa;letter-spacing:.5px}
+.cert-img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid #D4AF37;margin:0 auto 10px;display:block;position:relative;z-index:1}
+
+/* Form */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:.85rem;font-weight:500;margin-bottom:4px}
+.form-group input{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:.9rem;outline:none}
+.form-group input:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
+
+/* Toast */
+.toast-c{position:fixed;top:70px;right:16px;z-index:300;display:flex;flex-direction:column;gap:6px}
+.toast{padding:12px 18px;border-radius:8px;color:#fff;font-size:.88rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);max-width:360px;animation:slide .3s}
+@keyframes slide{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast.warn{background:#f59e0b}
+.toast.err{background:#ef4444}
+.toast.ok{background:#10b981}
+.toast.info{background:#2563eb}
+
+/* Actions row */
+.actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* Footer */
+.footer{text-align:center;padding:24px 16px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:.82rem}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 16px}
+.empty .icon{font-size:2.5rem;margin-bottom:8px}
+.empty h3{font-size:1.1rem;margin-bottom:6px}
+.empty p{color:#64748b;font-size:.88rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .skills-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .challenges-grid{grid-template-columns:1fr}
+  .r-grid{grid-template-columns:1fr 1fr}
+  .hero{padding:60px 16px 50px;min-height:400px}
+  .hero-stats{gap:20px;margin-top:24px}
+  .container{padding:12px}
+}
+@media(max-width:480px){
+  .skills-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .r-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="#" onclick="event.preventDefault();renderHome();observeReveal();return false">Batch15 Challenges</a>
+    <button class="navbar-back" id="backBtn" style="display:none">&larr; Back</button>
+  </div>
+</nav>
+
+<!-- HOMEPAGE -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-bg-slides">
+      <div class="hero-bg-slide"></div>
+      <div class="hero-bg-slide"></div>
+      <div class="hero-bg-slide"></div>
+      <div class="hero-bg-slide"></div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Batch15 <span>Challenges</span></h1>
+      <p>Master your IT &amp; Computer Science skills. Choose from 50+ skills, test your knowledge, earn certificates.</p>
+      <button class="hero-btn" id="heroBtn">Start Challenges &darr;</button>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num" id="statSkills">-</div><div class="hero-stat-label">Skills</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="statChallenges">-</div><div class="hero-stat-label">Challenges</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="statQuestions">-</div><div class="hero-stat-label">Questions</div></div>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <section class="section reveal">
+      <div class="section-header">
+        <h2>Explore Skills</h2>
+        <p>Click a skill to view challenges</p>
+      </div>
+      <input class="search-input reveal" id="searchInput" placeholder="Search skills..." autocomplete="off">
+      <div class="skills-grid" id="skillsGrid"></div>
+    </section>
+  </div>
+  <footer class="footer">&copy; 2026 Batch15 Challenges</footer>
+</div>
+
+<!-- SKILL PAGE (Challenges list) -->
+<div class="page" id="page-skill">
+  <div class="container">
+    <div class="challenge-header" id="skillHeader"></div>
+    <p id="skillDesc" style="color:#64748b;margin-bottom:20px"></p>
+    <div class="challenges-grid" id="challengesGrid"></div>
+  </div>
+</div>
+
+<!-- CHALLENGE PAGE (Exam) -->
+<div class="page" id="page-challenge">
+  <div class="container" style="max-width:800px">
+    <!-- PREGAME SCREEN -->
+    <div id="pregame" style="text-align:center;padding:40px 20px">
+      <div style="margin-bottom:8px" id="pregameIcon"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9z"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9z"/><path d="M4 22h16"/><path d="M10 22V16"/><path d="M14 22V16"/><path d="M12 16v-4"/><path d="M8 12h8"/><path d="M12 12V9"/><path d="M12 9c-1 0-2-.5-2-2V5h4v2c0 1.5-1 2-2 2z"/></svg></div>
+      <h2 id="pregameTitle" style="font-size:1.4rem;margin-bottom:6px">Challenge</h2>
+      <p id="pregameDesc" style="color:#64748b;margin-bottom:20px;font-size:.9rem"></p>
+      <div style="display:flex;justify-content:center;gap:20px;margin-bottom:28px;flex-wrap:wrap">
+        <div style="background:#f8fafc;padding:12px 20px;border-radius:8px"><strong style="color:#2563eb;font-size:1.2rem">50</strong><br><span style="font-size:.8rem;color:#64748b">Questions</span></div>
+        <div style="background:#f8fafc;padding:12px 20px;border-radius:8px"><strong style="color:#2563eb;font-size:1.2rem">1h 30m</strong><br><span style="font-size:.8rem;color:#64748b">Duration</span></div>
+        <div style="background:#f8fafc;padding:12px 20px;border-radius:8px"><strong style="color:#2563eb;font-size:1.2rem">50%</strong><br><span style="font-size:.8rem;color:#64748b">Pass Mark</span></div>
+      </div>
+      <button class="btn btn-p" id="startBtn" style="padding:14px 48px;font-size:1.05rem">Start Challenge</button>
+    </div>
+    <!-- EXAM SCREEN -->
+    <div id="examArea" style="display:none">
+      <div class="timer-box">
+        <div class="label">Time Remaining</div>
+        <div class="time" id="timerDisplay">01:30:00</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.85rem;color:#64748b;margin-bottom:4px">
+        <span id="qCounter">Question 1 of 50</span>
+        <span id="answeredCount">0 answered</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div id="questionArea" class="question-area"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS MODAL -->
+<div class="modal-overlay" id="resultsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Challenge Results</h2>
+      <button class="modal-close" onclick="closeModal('resultsModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="resultsBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-s" onclick="closeModal('resultsModal')">Close</button>
+      <button class="btn btn-p" onclick="openCertForm()">Get Certificate</button>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATE MODAL -->
+<div class="modal-overlay" id="certModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="certTitle">Your Certificate</h2>
+      <button class="modal-close" onclick="closeModal('certModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="certForm">
+        <form onsubmit="generateCert(event)">
+          <div class="form-group"><label>First Name</label><input id="fName" required placeholder="First name"></div>
+          <div class="form-group"><label>Second Name</label><input id="sName" required placeholder="Second name"></div>
+          <div class="form-group"><label>Third Name</label><input id="tName" required placeholder="Third name"></div>
+          <div class="form-group"><label>Upload Picture</label><input type="file" id="picFile" accept="image/*"></div>
+          <button class="btn btn-p" style="width:100%;justify-content:center">Generate Certificate</button>
+        </form>
+      </div>
+      <div id="certDisplay" style="display:none"></div>
+    </div>
+    <div class="modal-footer" id="certFooter" style="display:none">
+      <button class="btn btn-s" onclick="printCert()">Print</button>
+      <button class="btn btn-s" onclick="downloadPNG()">Download PNG</button>
+      <button class="btn btn-s" onclick="downloadPDF()">Download PDF</button>
+      <button class="btn btn-p" onclick="shareCert()">Share</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-c" id="toastC"></div>
+
+<script>
+/* ============================================================
+   BATCH15 CHALLENGES - COMPLETE APPLICATION
+   ============================================================ */
+
+/* ====== DATA ====== */
+var SKILLS_DATA = [
+  {id:'mobile-repairing',name:'Mobile Repairing',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>',desc:'Fix mobile devices'},
+  {id:'computer-repairing',name:'Computer Repairing',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',desc:'Repair computers'},
+  {id:'networking',name:'Networking',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="10" y1="7" x2="7" y2="17"/><line x1="14" y1="7" x2="17" y2="17"/><line x1="8" y1="19" x2="16" y2="19"/></svg>',desc:'Manage networks'},
+  {id:'programming',name:'Programming',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',desc:'Write code and build software'},
+  {id:'web-development',name:'Web Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',desc:'Build websites'},
+  {id:'software-eng',name:'Software Engineering',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',desc:'Develop software'},
+  {id:'database-admin',name:'Database Administration',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>',desc:'Manage databases'},
+  {id:'cloud-computing',name:'Cloud Computing',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>',desc:'Cloud services'},
+  {id:'ai',name:'Artificial Intelligence',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"/><path d="M16 14H8a4 4 0 0 0-4 4v2h16v-2a4 4 0 0 0-4-4z"/><circle cx="12" cy="7" r="1"/></svg>',desc:'AI systems'},
+  {id:'machine-learning',name:'Machine Learning',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',desc:'ML models'},
+  {id:'data-science',name:'Data Science',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>',desc:'Data analysis'},
+  {id:'ui-ux-design',name:'UI/UX Design',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>',desc:'Design interfaces'},
+  {id:'graphic-design',name:'Graphic Design',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="14.83"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/></svg>',desc:'Visual design'},
+  {id:'linux-admin',name:'Linux Administration',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',desc:'Linux systems'},
+  {id:'windows-admin',name:'Windows Administration',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>',desc:'Windows systems'},
+  {id:'devops',name:'DevOps',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',desc:'DevOps practices'},
+  {id:'android-dev',name:'Android Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/><line x1="9" y1="5" x2="9" y2="8"/><line x1="15" y1="5" x2="15" y2="8"/></svg>',desc:'Android apps'},
+  {id:'ios-dev',name:'iOS Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18"/></svg>',desc:'iOS apps'},
+  {id:'ethical-hacking',name:'Ethical Hacking',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="12" r="3"/></svg>',desc:'Security testing'},
+  {id:'iot',name:'IoT',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3"/><path d="M6 22h3a5 5 0 0 0 5-5v-3"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',desc:'Internet of Things'},
+  {id:'embedded-systems',name:'Embedded Systems',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="8" cy="8" r="1"/><circle cx="16" cy="8" r="1"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="16" r="1"/></svg>',desc:'Embedded systems'},
+  {id:'api-dev',name:'API Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',desc:'Build APIs'},
+  {id:'git-github',name:'Git & GitHub',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>',desc:'Version control'},
+  {id:'project-mgmt',name:'Project Management',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>',desc:'Manage projects'},
+  {id:'react-dev',name:'React Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 0 1 7.07 17.07"/><path d="M12 22a10 10 0 0 1-7.07-17.07"/><path d="M2 12h20"/><path d="M4.93 4.93l14.14 14.14"/><path d="M4.93 19.07L19.07 4.93"/></svg>',desc:'React apps'},
+  {id:'nodejs',name:'Node.js Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4.5v11L12 22l-8-4.5v-11L12 2z"/><path d="M12 22V12"/><path d="M20 6.5L12 12"/></svg>',desc:'Server JS'},
+  {id:'angular',name:'Angular Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 4 18 12 22 20 18 22 7"/><line x1="12" y1="6" x2="12" y2="18"/><line x1="9" y1="10" x2="15" y2="14"/></svg>',desc:'Angular apps'},
+  {id:'vuejs',name:'Vue.js Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 21 12 21 22 21"/><polygon points="12 2 7 21 12 21 17 21"/></svg>',desc:'Vue apps'},
+  {id:'docker-kubernetes',name:'Docker & Kubernetes',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="12" rx="2"/><path d="M6 6h4v4H6z"/><path d="M14 6h4v4h-4z"/><path d="M10 14h4v4h-4z"/></svg>',desc:'Containers'},
+  {id:'aws',name:'AWS Cloud',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M12 5v6l3 2"/></svg>',desc:'Amazon Web Services'},
+  {id:'azure',name:'Microsoft Azure',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8v8H8z"/><path d="M8 12h8"/></svg>',desc:'Azure cloud'},
+  {id:'gcp',name:'Google Cloud Platform',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9" y2="9"/><line x1="15" y1="9" x2="15" y2="9"/></svg>',desc:'Google cloud'},
+  {id:'blockchain',name:'Blockchain Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',desc:'Blockchain'},
+  {id:'game-dev',name:'Game Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4"/><circle cx="16" cy="11" r="1"/><circle cx="18" cy="13" r="1"/></svg>',desc:'Make games'},
+  {id:'ar-vr',name:'AR/VR Development',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',desc:'AR/VR experiences'},
+  {id:'robotics',name:'Robotics',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="8" rx="2"/><line x1="10" y1="16" x2="10" y2="20"/><line x1="14" y1="16" x2="14" y2="20"/><circle cx="8" cy="12" r="1"/><circle cx="16" cy="12" r="1"/></svg>',desc:'Robots'},
+  {id:'big-data',name:'Big Data',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M18 7v6"/><path d="M6 7v6"/></svg>',desc:'Big data processing'},
+  {id:'sys-admin',name:'System Administration',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M10 7l-3 3 3 3"/><path d="M14 7l3 3-3 3"/></svg>',desc:'IT infrastructure'},
+  {id:'network-security',name:'Network Security',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',desc:'Protect networks'},
+  {id:'cryptography',name:'Cryptography',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>',desc:'Encryption'},
+  {id:'digital-marketing',name:'Digital Marketing',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>',desc:'Online marketing'},
+  {id:'seo',name:'SEO',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>',desc:'Search optimization'},
+  {id:'computer-fund',name:'Computer Fundamentals',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="10" r="2"/><path d="M8 18v-2a4 4 0 0 1 8 0v2"/></svg>',desc:'Basic computing'},
+  {id:'cyber-security',name:'Cyber Security',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',desc:'Security',noQ:true},
+  {id:'qa-testing',name:'QA & Testing',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',desc:'Software testing'},
+  {id:'it-support',name:'IT Support',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',desc:'Helpdesk & support'},
+  {id:'microservices',name:'Microservices',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="8" height="8" rx="2"/><rect x="14" y="2" width="8" height="8" rx="2"/><rect x="2" y="14" width="8" height="8" rx="2"/><rect x="14" y="14" width="8" height="8" rx="2"/></svg>',desc:'Distributed systems'},
+  {id:'power-bi',name:'Power BI',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>',desc:'Data visualization'},
+  {id:'salesforce',name:'Salesforce',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',desc:'CRM platform'},
+  {id:'agile-scrum',name:'Agile & Scrum',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',desc:'Project methodologies'}
+];
+
+var CHALLENGES_DATA = {
+  'mobile-repairing':[
+    {id:'kp1',name:'Keypad Repairing 01',topics:['keypad','buttons','keyboard','flex cable']},
+    {id:'kp2',name:'Keypad Repairing 02',topics:['keypad','soldering','multimeter','short circuit']},
+    {id:'kp3',name:'Keypad Repairing 03',topics:['keypad','water damage','corrosion','testing']},
+    {id:'ar1',name:'Android Repairing 01',topics:['screen','battery','charging port','power']},
+    {id:'ar2',name:'Android Repairing 02',topics:['motherboard','cpu','emmc','thermal']},
+    {id:'ar3',name:'Android Repairing 03',topics:['unlock','frp','firmware','bootloader']},
+    {id:'ir1',name:'iPhone Repairing 01',topics:['screen','battery','charging ic','face id']},
+    {id:'ir2',name:'iPhone Repairing 02',topics:['baseband','network','audio','power mgmt']},
+    {id:'ir3',name:'iPhone Repairing 03',topics:['microsoldering','board repair','water','component']},
+    {id:'cr1',name:'Computer Repairing 01',topics:['hardware','motherboard','cpu','ram','psu']},
+    {id:'cr2',name:'Computer Repairing 02',topics:['storage','hdd','ssd','data recovery']},
+    {id:'cr3',name:'Computer Repairing 03',topics:['laptop','display','keyboard','thermal','fan']}
+  ],
+  'computer-repairing':[
+    {id:'bh1',name:'Basic Hardware 01',topics:['motherboard','cpu','ram','psu','cooling']},
+    {id:'bh2',name:'Basic Hardware 02',topics:['storage','hdd','ssd','ports','cables']},
+    {id:'bh3',name:'Basic Hardware 03',topics:['gpu','bios','cmos','expansion']},
+    {id:'lr1',name:'Laptop Repair 01',topics:['laptop','disassembly','screen','keyboard','hinge']},
+    {id:'lr2',name:'Laptop Repair 02',topics:['power jack','dc jack','charging','battery']},
+    {id:'ts1',name:'Troubleshooting 01',topics:['diagnostics','post','beep codes','blue screen']}
+  ],
+  'networking':[
+    {id:'nf1',name:'Net Fundamentals 01',topics:['osi model','tcp ip','ip addressing','subnet']},
+    {id:'nf2',name:'Net Fundamentals 02',topics:['routing','switching','vlan','nat','firewall']},
+    {id:'nf3',name:'Net Fundamentals 03',topics:['wireless','wifi','bluetooth','signal']},
+    {id:'cb1',name:'Cabling & Connectors',topics:['ethernet','cable','rj45','fiber','coaxial']},
+    {id:'nd1',name:'Network Devices 01',topics:['router','switch','hub','bridge','gateway']}
+  ],
+  'programming':[
+    {id:'pb1',name:'Programming Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" stroke="#6366f1" stroke-width="1.8"/><path d="M12 13l-3 3 3 3M20 13l3 3-3 3" stroke="#6366f1" stroke-width="1.8" stroke-linecap="round"/><line x1="17" y1="11" x2="15" y2="21" stroke="#6366f1" stroke-width="1.8"/></svg>',topics:['variables','data types','operators','loops']},
+    {id:'pb2',name:'Programming Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="4" y="6" width="24" height="20" rx="3" stroke="#6366f1" stroke-width="1.8"/><path d="M12 13l-3 3 3 3M20 13l3 3-3 3" stroke="#6366f1" stroke-width="1.8" stroke-linecap="round"/><line x1="17" y1="11" x2="15" y2="21" stroke="#6366f1" stroke-width="1.8"/></svg>',topics:['functions','arrays','strings','recursion']},
+    {id:'oop1',name:'OOP Concepts 01',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="5" width="10" height="10" rx="2" stroke="#8b5cf6" stroke-width="1.8"/><rect x="17" y="5" width="10" height="10" rx="2" stroke="#8b5cf6" stroke-width="1.8"/><rect x="5" y="17" width="10" height="10" rx="2" stroke="#8b5cf6" stroke-width="1.8"/><rect x="17" y="17" width="10" height="10" rx="2" fill="#8b5cf6" opacity=".2"/><path d="M22 17l-2 5h4l-2 5" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['class','object','inheritance','polymorphism']},
+    {id:'ds1',name:'Data Structures 01',icon:'<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="8" r="3.5" stroke="#06b6d4" stroke-width="1.8"/><circle cx="8" cy="24" r="3.5" stroke="#06b6d4" stroke-width="1.8"/><circle cx="24" cy="24" r="3.5" stroke="#06b6d4" stroke-width="1.8"/><line x1="14" y1="11" x2="10" y2="21" stroke="#06b6d4" stroke-width="1.8"/><line x1="18" y1="11" x2="22" y2="21" stroke="#06b6d4" stroke-width="1.8"/></svg>',topics:['array','linked list','stack','queue','tree']},
+    {id:'al1',name:'Algorithms 01',icon:'<svg viewBox="0 0 32 32" fill="none"><polyline points="4,24 12,16 20,20 28,8" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="8" r="2.5" fill="#f59e0b"/><circle cx="4" cy="24" r="2.5" fill="#f59e0b"/><circle cx="12" cy="16" r="2.5" fill="#f59e0b"/><circle cx="20" cy="20" r="2.5" fill="#f59e0b"/></svg>',topics:['sorting','searching','complexity','greedy']},
+    {id:'py_pb1',name:'Python Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M13 4c-4 0-5 2-5 4v3c0 2 1 4 5 4h6c3 0 4 2 4 4v3c0 2-1 4-4 4h-6" stroke="#3776ab" stroke-width="1.8" stroke-linecap="round"/><path d="M19 28c4 0 5-2 5-4v-3c0-2-1-4-5-4h-6c-3 0-4-2-4-4v-3c0-2 1-4 4-4h6" stroke="#ffd43b" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="8" r="1" fill="#3776ab"/><circle cx="21" cy="24" r="1" fill="#ffd43b"/></svg>',topics:['syntax','variables','lists','dicts','control flow']},
+    {id:'py_pb2',name:'Python Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M13 4c-4 0-5 2-5 4v3c0 2 1 4 5 4h6c3 0 4 2 4 4v3c0 2-1 4-4 4h-6" stroke="#3776ab" stroke-width="1.8" stroke-linecap="round"/><path d="M19 28c4 0 5-2 5-4v-3c0-2-1-4-5-4h-6c-3 0-4-2-4-4v-3c0-2 1-4 4-4h6" stroke="#ffd43b" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="8" r="1" fill="#3776ab"/><circle cx="21" cy="24" r="1" fill="#ffd43b"/></svg>',topics:['functions','modules','file i/o','exceptions']},
+    {id:'py_pa1',name:'Python Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M13 4c-4 0-5 2-5 4v3c0 2 1 4 5 4h6c3 0 4 2 4 4v3c0 2-1 4-4 4h-6" stroke="#3776ab" stroke-width="1.8" stroke-linecap="round"/><path d="M19 28c4 0 5-2 5-4v-3c0-2-1-4-5-4h-6c-3 0-4-2-4-4v-3c0-2 1-4 4-4h6" stroke="#ffd43b" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="8" r="1" fill="#3776ab"/><circle cx="21" cy="24" r="1" fill="#ffd43b"/></svg>',topics:['decorators','generators','async','metaclass']},
+    {id:'jv_jb1',name:'Java Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 4c-4 2-8 8-8 14s2 8 4 10" stroke="#f89820" stroke-width="1.8" stroke-linecap="round"/><path d="M16 4c4 2 8 8 8 14s-2 8-4 10" stroke="#5382a1" stroke-width="1.8" stroke-linecap="round"/><path d="M10 20h12M8 15h16" stroke="#5382a1" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['jdk','jvm','syntax','oop','data types']},
+    {id:'jv_jb2',name:'Java Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 4c-4 2-8 8-8 14s2 8 4 10" stroke="#f89820" stroke-width="1.8" stroke-linecap="round"/><path d="M16 4c4 2 8 8 8 14s-2 8-4 10" stroke="#5382a1" stroke-width="1.8" stroke-linecap="round"/><path d="M10 20h12M8 15h16" stroke="#5382a1" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['inheritance','interface','generics','exception']},
+    {id:'jv_ja1',name:'Java Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 4c-4 2-8 8-8 14s2 8 4 10" stroke="#f89820" stroke-width="1.8" stroke-linecap="round"/><path d="M16 4c4 2 8 8 8 14s-2 8-4 10" stroke="#5382a1" stroke-width="1.8" stroke-linecap="round"/><path d="M10 20h12M8 15h16" stroke="#5382a1" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['streams','lambda','reflection','jdbc']},
+    {id:'js_jb1',name:'JS Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="5" width="22" height="22" rx="2" stroke="#f7df1e" stroke-width="1.8"/><path d="M19 23c1 0 2-.5 2-1.5s-1-1.5-2-2c-1-.5-2-1-2-2s1-1.5 2-1.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/><path d="M13 23c1 0 2-.5 2-1.5s-1-1.5-2-2" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>',topics:['variables','functions','objects','arrays','scope']},
+    {id:'js_jb2',name:'JS Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="5" width="22" height="22" rx="2" stroke="#f7df1e" stroke-width="1.8"/><path d="M19 23c1 0 2-.5 2-1.5s-1-1.5-2-2c-1-.5-2-1-2-2s1-1.5 2-1.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/><path d="M13 23c1 0 2-.5 2-1.5s-1-1.5-2-2" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>',topics:['prototype','callbacks','promises','async','event loop']},
+    {id:'js_ja1',name:'JS Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="5" width="22" height="22" rx="2" stroke="#f7df1e" stroke-width="1.8"/><path d="M19 23c1 0 2-.5 2-1.5s-1-1.5-2-2c-1-.5-2-1-2-2s1-1.5 2-1.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/><path d="M13 23c1 0 2-.5 2-1.5s-1-1.5-2-2" stroke="#000" stroke-width="1.5" stroke-linecap="round"/></svg>',topics:['modules','proxy','symbols','iterators','generators']},
+    {id:'cpp_cb1',name:'C++ Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M8 11v10l8 5 8-5V11l-8-5-8 5z" stroke="#00599c" stroke-width="1.8"/><path d="M13 13v6l3 2 3-2v-6l-3-2-3 2z" stroke="#00599c" stroke-width="1.8" fill="#00599c" opacity=".15"/><line x1="10" y1="16" x2="12" y2="16" stroke="#00599c" stroke-width="1.8"/><line x1="20" y1="16" x2="22" y2="16" stroke="#00599c" stroke-width="1.8"/><line x1="16" y1="12" x2="16" y2="14" stroke="#00599c" stroke-width="1.8"/><line x1="16" y1="18" x2="16" y2="20" stroke="#00599c" stroke-width="1.8"/></svg>',topics:['syntax','pointers','references','classes','inheritance']},
+    {id:'cpp_cb2',name:'C++ Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M8 11v10l8 5 8-5V11l-8-5-8 5z" stroke="#00599c" stroke-width="1.8"/><path d="M13 13v6l3 2 3-2v-6l-3-2-3 2z" stroke="#00599c" stroke-width="1.8" fill="#00599c" opacity=".15"/><line x1="10" y1="16" x2="12" y2="16" stroke="#00599c" stroke-width="1.8"/><line x1="20" y1="16" x2="22" y2="16" stroke="#00599c" stroke-width="1.8"/><line x1="16" y1="12" x2="16" y2="14" stroke="#00599c" stroke-width="1.8"/><line x1="16" y1="18" x2="16" y2="20" stroke="#00599c" stroke-width="1.8"/></svg>',topics:['templates','stl','smart pointers','lambda']},
+    {id:'cpp_ca1',name:'C++ Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M8 11v10l8 5 8-5V11l-8-5-8 5z" stroke="#00599c" stroke-width="1.8"/><path d="M13 13v6l3 2 3-2v-6l-3-2-3 2z" stroke="#00599c" stroke-width="1.8" fill="#00599c" opacity=".15"/><line x1="10" y1="16" x2="12" y2="16" stroke="#00599c" stroke-width="1.8"/><line x1="20" y1="16" x2="22" y2="16" stroke="#00599c" stroke-width="1.8"/><line x1="16" y1="12" x2="16" y2="14" stroke="#00599c" stroke-width="1.8"/><line x1="16" y1="18" x2="16" y2="20" stroke="#00599c" stroke-width="1.8"/></svg>',topics:['memory mgmt','multi-threading','optimization']},
+    {id:'cs_cb1',name:'C# Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="6" y="6" width="20" height="20" rx="4" stroke="#239120" stroke-width="1.8"/><line x1="16" y1="6" x2="16" y2="26" stroke="#239120" stroke-width="1.8" opacity=".4"/><line x1="6" y1="16" x2="26" y2="16" stroke="#239120" stroke-width="1.8" opacity=".4"/></svg>',topics:['syntax','oop','properties','events','delegates','linq']},
+    {id:'cs_cb2',name:'C# Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="6" y="6" width="20" height="20" rx="4" stroke="#239120" stroke-width="1.8"/><line x1="16" y1="6" x2="16" y2="26" stroke="#239120" stroke-width="1.8" opacity=".4"/><line x1="6" y1="16" x2="26" y2="16" stroke="#239120" stroke-width="1.8" opacity=".4"/></svg>',topics:['async','task','generics','reflection','serialization']},
+    {id:'cs_ca1',name:'C# Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="6" y="6" width="20" height="20" rx="4" stroke="#239120" stroke-width="1.8"/><line x1="16" y1="6" x2="16" y2="26" stroke="#239120" stroke-width="1.8" opacity=".4"/><line x1="6" y1="16" x2="26" y2="16" stroke="#239120" stroke-width="1.8" opacity=".4"/></svg>',topics:['asp.net','entity','wpf','web api','dependency injection']},
+    {id:'php_pb1',name:'PHP Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="16" rx="12" ry="8" stroke="#777bb3" stroke-width="1.8"/><text x="16" y="20" font-size="12" font-weight="bold" fill="#777bb3" text-anchor="middle" font-family="Arial">PHP</text></svg>',topics:['syntax','variables','arrays','sessions','forms']},
+    {id:'php_pb2',name:'PHP Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="16" rx="12" ry="8" stroke="#777bb3" stroke-width="1.8"/><text x="16" y="20" font-size="12" font-weight="bold" fill="#777bb3" text-anchor="middle" font-family="Arial">PHP</text></svg>',topics:['oop','pdo','mvc','routing','composer']},
+    {id:'php_pa1',name:'PHP Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><ellipse cx="16" cy="16" rx="12" ry="8" stroke="#777bb3" stroke-width="1.8"/><text x="16" y="20" font-size="12" font-weight="bold" fill="#777bb3" text-anchor="middle" font-family="Arial">PHP</text></svg>',topics:['laravel','symfony','wordpress','security']},
+    {id:'rb_rb1',name:'Ruby Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><polygon points="16,4 6,12 10,26 22,26 26,12" stroke="#cc342d" stroke-width="1.8"/><polygon points="16,10 11,15 13,23 19,23 21,15" stroke="#cc342d" stroke-width="1.8" opacity=".3"/><text x="16" y="20" font-size="9" font-weight="bold" fill="#cc342d" text-anchor="middle" font-family="Arial">Rb</text></svg>',topics:['syntax','objects','methods','arrays','blocks']},
+    {id:'rb_rb2',name:'Ruby Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><polygon points="16,4 6,12 10,26 22,26 26,12" stroke="#cc342d" stroke-width="1.8"/><polygon points="16,10 11,15 13,23 19,23 21,15" stroke="#cc342d" stroke-width="1.8" opacity=".3"/><text x="16" y="20" font-size="9" font-weight="bold" fill="#cc342d" text-anchor="middle" font-family="Arial">Rb</text></svg>',topics:['symbols','modules','mixins','metaprogramming']},
+    {id:'rb_ra1',name:'Ruby Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><polygon points="16,4 6,12 10,26 22,26 26,12" stroke="#cc342d" stroke-width="1.8"/><polygon points="16,10 11,15 13,23 19,23 21,15" stroke="#cc342d" stroke-width="1.8" opacity=".3"/><text x="16" y="20" font-size="9" font-weight="bold" fill="#cc342d" text-anchor="middle" font-family="Arial">Rb</text></svg>',topics:['rails','active record','mvc','gem','testing']},
+    {id:'sw_sb1',name:'Swift Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M4 20c2-8 10-14 18-16-4 4-8 10-10 18" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/><path d="M6 24c6-4 12-4 16 0" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/><path d="M24 6l-6 10" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['syntax','variables','optionals','functions','struct']},
+    {id:'sw_sb2',name:'Swift Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M4 20c2-8 10-14 18-16-4 4-8 10-10 18" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/><path d="M6 24c6-4 12-4 16 0" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/><path d="M24 6l-6 10" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['protocol','extension','enum','error handling']},
+    {id:'sw_sa1',name:'Swift Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M4 20c2-8 10-14 18-16-4 4-8 10-10 18" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/><path d="M6 24c6-4 12-4 16 0" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/><path d="M24 6l-6 10" stroke="#f05138" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['swiftui','combine','async await','core data']},
+    {id:'go_gb1',name:'Go Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M10 8c6-3 16-2 18 2s-8 6-14 4" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/><path d="M8 14c4-2 14-2 16 2s-8 6-14 4" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/><path d="M6 20c4-2 12-2 14 2" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['syntax','goroutines','channels','interfaces','structs']},
+    {id:'go_gb2',name:'Go Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M10 8c6-3 16-2 18 2s-8 6-14 4" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/><path d="M8 14c4-2 14-2 16 2s-8 6-14 4" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/><path d="M6 20c4-2 12-2 14 2" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['error handling','defer','testing','json','http server']},
+    {id:'go_ga1',name:'Go Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><path d="M10 8c6-3 16-2 18 2s-8 6-14 4" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/><path d="M8 14c4-2 14-2 16 2s-8 6-14 4" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/><path d="M6 20c4-2 12-2 14 2" stroke="#00add8" stroke-width="1.8" stroke-linecap="round"/></svg>',topics:['concurrency patterns','reflection','microservices']},
+    {id:'rs_rb1',name:'Rust Basics 01',icon:'<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke="#dea584" stroke-width="1.8"/><circle cx="16" cy="16" r="4" stroke="#dea584" stroke-width="1.8"/><path d="M16 6v4M16 22v4M6 16h4M22 16h4" stroke="#dea584" stroke-width="1.8"/></svg>',topics:['ownership','borrowing','lifetimes','structs','enums']},
+    {id:'rs_rb2',name:'Rust Basics 02',icon:'<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke="#dea584" stroke-width="1.8"/><circle cx="16" cy="16" r="4" stroke="#dea584" stroke-width="1.8"/><path d="M16 6v4M16 22v4M6 16h4M22 16h4" stroke="#dea584" stroke-width="1.8"/></svg>',topics:['traits','generics','closures','iterators']},
+    {id:'rs_ra1',name:'Rust Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke="#dea584" stroke-width="1.8"/><circle cx="16" cy="16" r="4" stroke="#dea584" stroke-width="1.8"/><path d="M16 6v4M16 22v4M6 16h4M22 16h4" stroke="#dea584" stroke-width="1.8"/></svg>',topics:['unsafe','ffi','macros','async','concurrency']},
+    {id:'ts_tb1',name:'TypeScript Basics',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="5" width="22" height="22" rx="2" stroke="#3178c6" stroke-width="1.8"/><text x="16" y="21" font-size="14" font-weight="bold" fill="#3178c6" text-anchor="middle" font-family="Arial">TS</text></svg>',topics:['types','interfaces','enums','generics','union']},
+    {id:'ts_ta1',name:'TypeScript Advanced',icon:'<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="5" width="22" height="22" rx="2" stroke="#3178c6" stroke-width="1.8"/><text x="16" y="21" font-size="14" font-weight="bold" fill="#3178c6" text-anchor="middle" font-family="Arial">TS</text></svg>',topics:['mapped types','conditional types','decorators','module']}
+  ],
+  'database-admin':[
+    {id:'sb1',name:'SQL Basics 01',topics:['select','insert','update','delete','join']},
+    {id:'sb2',name:'SQL Basics 02',topics:['group by','having','subquery','index','view']},
+    {id:'dd1',name:'DB Design 01',topics:['normalization','er diagram','primary key','foreign key']},
+    {id:'da1',name:'DB Admin 01',topics:['backup','restore','security','user','transaction']}
+  ],
+  'web-development':[
+    {id:'ht1',name:'HTML Fundamentals',topics:['html','tags','forms','tables','semantic']},
+    {id:'cs1',name:'CSS Styling',topics:['css','selectors','flexbox','grid','responsive']},
+    {id:'jw1',name:'JavaScript Web',topics:['dom','events','fetch','ajax','storage']},
+    {id:'fe1',name:'Frontend Dev',topics:['react','vue','angular','sass','spa']},
+    {id:'be1',name:'Backend Dev',topics:['node','express','php','api','rest']}
+  ],
+  'software-eng':[
+    {id:'sd1',name:'SDLC Models',topics:['waterfall','agile','scrum','devops','v-model']},
+    {id:'rq1',name:'Requirements',topics:['functional','non-functional','use case','user story']},
+    {id:'te1',name:'Testing',topics:['unit test','integration','system','tdd','regression']},
+    {id:'dp1',name:'Design Patterns',topics:['singleton','factory','observer','strategy','mvc']}
+  ],
+  'cloud-computing':[
+    {id:'cb1',name:'Cloud Basics 01',topics:['iaas','paas','saas','public','private','hybrid']},
+    {id:'cb2',name:'Cloud Basics 02',topics:['virtualization','hypervisor','scaling','load balancer']},
+    {id:'cd1',name:'Cloud Deployment',topics:['deployment','ci/cd','container','terraform']}
+  ],
+  'ai':[
+    {id:'ab1',name:'AI Fundamentals',topics:['neural network','deep learning','nlp','computer vision']},
+    {id:'aa1',name:'AI Algorithms',topics:['search','genetic','fuzzy logic','expert system','bayesian']}
+  ],
+  'machine-learning':[
+    {id:'mb1',name:'ML Fundamentals',topics:['supervised','unsupervised','regression','classification']},
+    {id:'ma1',name:'ML Algorithms 01',topics:['linear regression','decision tree','svm','knn']},
+    {id:'ma2',name:'ML Algorithms 02',topics:['random forest','gradient boosting','pca','cnn']}
+  ],
+  'data-science':[
+    {id:'db1',name:'Data Science Basics',topics:['pandas','numpy','visualization','statistics']},
+    {id:'da1',name:'Data Analysis',topics:['cleaning','transformation','exploration','hypothesis']}
+  ],
+  'ui-ux-design':[
+    {id:'ub1',name:'UI Design Basics',topics:['color','typography','layout','hierarchy']},
+    {id:'ux1',name:'UX Design Basics',topics:['user research','wireframe','prototype','usability']},
+    {id:'ut1',name:'Design Tools',topics:['figma','sketch','adobe xd','photoshop']}
+  ],
+  'graphic-design':[
+    {id:'gb1',name:'Design Fundamentals',topics:['composition','balance','color theory','branding']},
+    {id:'gs1',name:'Design Software',topics:['photoshop','illustrator','indesign','coreldraw']}
+  ],
+  'linux-admin':[
+    {id:'lb1',name:'Linux Basics 01',topics:['commands','filesystem','permissions','users','shell']},
+    {id:'lb2',name:'Linux Basics 02',topics:['bash','cron','systemd','services','logging']},
+    {id:'la1',name:'Linux Admin',topics:['package mgmt','network','firewall','selinux','lvm']}
+  ],
+  'windows-admin':[
+    {id:'wb1',name:'Windows Basics 01',topics:['desktop','control panel','users','groups']},
+    {id:'wa1',name:'Windows Admin',topics:['active directory','group policy','powershell','iis']},
+    {id:'ws1',name:'Windows Server',topics:['domain controller','fsmo','rds','hyper-v']}
+  ],
+  'devops':[
+    {id:'db1',name:'DevOps Basics',topics:['ci/cd','automation','monitoring','logging']},
+    {id:'dt1',name:'DevOps Tools',topics:['jenkins','gitlab ci','ansible','terraform','prometheus']},
+    {id:'co1',name:'Containerization',topics:['docker','kubernetes','pod','service','helm']}
+  ],
+  'android-dev':[
+    {id:'ab1',name:'Android Basics 01',topics:['activity','fragment','layout','intent','manifest']},
+    {id:'ab2',name:'Android Basics 02',topics:['recyclerview','navigation','room','viewmodel']},
+    {id:'aa1',name:'Android Advanced',topics:['networking','firebase','testing','publishing']}
+  ],
+  'ios-dev':[
+    {id:'ib1',name:'iOS Basics 01',topics:['swift','xcode','storyboard','view controller']},
+    {id:'ib2',name:'iOS Basics 02',topics:['auto layout','navigation','core data','networking']},
+    {id:'ia1',name:'iOS Advanced',topics:['swiftui','combine','arkit','core ml']}
+  ],
+  'ethical-hacking':[
+    {id:'eb1',name:'EH Basics',topics:['footprinting','scanning','enumeration','exploitation']},
+    {id:'et1',name:'Hacking Tools',topics:['nmap','metasploit','wireshark','burp suite']},
+    {id:'ea1',name:'Advanced Hacking',topics:['penetration testing','web app','reverse engineering']}
+  ],
+  'iot':[
+    {id:'ib1',name:'IoT Fundamentals',topics:['sensors','actuators','arduino','raspberry pi']},
+    {id:'ic1',name:'IoT Communication',topics:['mqtt','coap','bluetooth','zigbee','wifi']},
+    {id:'ip1',name:'IoT Projects',topics:['home automation','smart city','industrial','healthcare']}
+  ],
+  'embedded-systems':[
+    {id:'eb1',name:'Embedded Basics',topics:['microcontroller','microprocessor','rtos','gpio']},
+    {id:'ep1',name:'Embedded Programming',topics:['c embedded','assembly','register','memory map']},
+    {id:'ec1',name:'Embedded Communication',topics:['i2c','spi','uart','can','usb']}
+  ],
+  'api-dev':[
+    {id:'ab1',name:'API Basics',topics:['rest','graphql','soap','http methods','status codes']},
+    {id:'ad1',name:'API Design',topics:['endpoints','versioning','pagination','error handling']},
+    {id:'as1',name:'API Security',topics:['jwt','oauth','api key','cors','csrf']}
+  ],
+  'git-github':[
+    {id:'gb1',name:'Git Basics 01',topics:['init','add','commit','push','pull','clone']},
+    {id:'gb2',name:'Git Basics 02',topics:['branch','merge','rebase','conflict','stash']},
+    {id:'gh1',name:'GitHub Workflow',topics:['pull request','fork','issues','actions','pages']}
+  ],
+  'project-mgmt':[
+    {id:'pb1',name:'PM Fundamentals',topics:['scope','schedule','cost','quality','risk']},
+    {id:'pm1',name:'PM Methodologies',topics:['waterfall','agile','scrum','kanban','lean']},
+    {id:'pt1',name:'PM Tools',topics:['jira','trello','ms project','asana','slack']}
+  ],
+  'react-dev':[
+    {id:'rb1',name:'React Basics 01',topics:['jsx','components','props','state','hooks']},
+    {id:'rb2',name:'React Basics 02',topics:['useEffect','useContext','useReducer','forms','routing']},
+    {id:'ra1',name:'React Advanced',topics:['redux','performance','testing','next.js','ssr']}
+  ],
+  'nodejs':[
+    {id:'nb1',name:'Node.js Basics',topics:['npm','modules','event loop','streams','file system']},
+    {id:'ne1',name:'Express.js',topics:['routing','middleware','error handling','rest api']},
+    {id:'na1',name:'Node.js Advanced',topics:['auth','websockets','clustering','testing']}
+  ],
+  'angular':[
+    {id:'ab1',name:'Angular Basics',topics:['components','modules','templates','directives','services','di']},
+    {id:'aa1',name:'Angular Advanced',topics:['routing','forms','http client','pipes','guards','rxjs']}
+  ],
+  'vuejs':[
+    {id:'vb1',name:'Vue.js Basics',topics:['vue instance','template','directives','computed','components']},
+    {id:'va1',name:'Vue.js Advanced',topics:['vuex','router','composition api','mixins']}
+  ],
+  'docker-kubernetes':[
+    {id:'db1',name:'Docker Basics',topics:['container','image','dockerfile','volume','compose']},
+    {id:'kb1',name:'Kubernetes Basics',topics:['pod','deployment','service','configmap','ingress']},
+    {id:'ca1',name:'Container Advanced',topics:['helm','monitoring','scaling','security','ci/cd']}
+  ],
+  'aws':[
+    {id:'ab1',name:'AWS Basics',topics:['ec2','s3','rds','lambda','iam','vpc']},
+    {id:'aa1',name:'AWS Advanced',topics:['cloudfront','route53','dynamodb','sns','sqs']},
+    {id:'aa2',name:'AWS Architecture',topics:['high availability','scaling','disaster recovery','serverless']}
+  ],
+  'azure':[
+    {id:'ab1',name:'Azure Basics',topics:['vm','blob storage','sql database','function','aad','vnet']},
+    {id:'aa1',name:'Azure Advanced',topics:['devops','kubernetes','logic apps','key vault','monitor']}
+  ],
+  'gcp':[
+    {id:'gb1',name:'GCP Basics',topics:['compute engine','cloud storage','cloud sql','cloud function']},
+    {id:'ga1',name:'GCP Advanced',topics:['gke','bigquery','pub/sub','dataflow','cloud cdn']}
+  ],
+  'blockchain':[
+    {id:'bb1',name:'Blockchain Basics',topics:['block','chain','consensus','mining','hash']},
+    {id:'bd1',name:'Blockchain Dev',topics:['ethereum','smart contract','solidity','web3','dapp']},
+    {id:'ba1',name:'Blockchain Advanced',topics:['defi','nft','layer2','cryptography']}
+  ],
+  'game-dev':[
+    {id:'gb1',name:'Game Dev Basics',topics:['unity','unreal','game loop','physics','rendering']},
+    {id:'ga1',name:'Game Dev Advanced',topics:['ai in games','networking','optimization','shaders']}
+  ],
+  'ar-vr':[
+    {id:'ab1',name:'AR/VR Basics',topics:['headset','tracking','rendering','stereoscopic','immersion']},
+    {id:'ad1',name:'AR/VR Dev',topics:['unity ar','arkit','arcore','webxr','3d modeling']}
+  ],
+  'robotics':[
+    {id:'rb1',name:'Robotics Basics',topics:['sensors','actuators','control','kinematics','programming']},
+    {id:'ra1',name:'Robotics Advanced',topics:['computer vision','autonomous','slam','path planning']}
+  ],
+  'big-data':[
+    {id:'bb1',name:'Big Data Basics',topics:['hadoop','spark','mapreduce','hdfs','nosql']},
+    {id:'ba1',name:'Big Data Advanced',topics:['kafka','flink','cassandra','elasticsearch','data lake']}
+  ],
+  'sys-admin':[
+    {id:'sb1',name:'SysAdmin Basics',topics:['os','users','permissions','backup','monitoring']},
+    {id:'sa1',name:'SysAdmin Advanced',topics:['automation','virtualization','disaster recovery']}
+  ],
+  'network-security':[
+    {id:'nb1',name:'NetSec Basics',topics:['firewall','ids','ips','vpn','acl','segmentation']},
+    {id:'na1',name:'NetSec Advanced',topics:['siem','threat hunting','forensics','zero trust']}
+  ],
+  'cryptography':[
+    {id:'cb1',name:'Crypto Basics',topics:['symmetric','asymmetric','hash','digital signature','pki']},
+    {id:'ca1',name:'Crypto Advanced',topics:['aes','rsa','ecc','tls','quantum crypto']}
+  ],
+  'digital-marketing':[
+    {id:'db1',name:'Digital Marketing Basics',topics:['social media','email','content','analytics','seo','ppc']},
+    {id:'da1',name:'Digital Marketing Adv',topics:['conversion','funnel','retargeting','influencer','automation']}
+  ],
+  'seo':[
+    {id:'sb1',name:'SEO Basics',topics:['keyword','on-page','off-page','backlink','meta tags']},
+    {id:'sa1',name:'SEO Advanced',topics:['technical seo','analytics','structured data','core web vitals']}
+  ],
+  'computer-fund':[
+    {id:'cb1',name:'Computer Basics 01',topics:['cpu','memory','storage','input','output','peripheral']},
+    {id:'cb2',name:'Computer Basics 02',topics:['software','os','files','network','internet','security']},
+    {id:'cc1',name:'Computer Concepts',topics:['binary','logic gates','number system','algorithm']}
+  ],
+  'qa-testing':[
+    {id:'qt1',name:'Testing Basics',topics:['manual testing','test cases','bug reporting','test plan']},
+    {id:'qt2',name:'Automation Testing',topics:['selenium','cypress','junit','testng','ci/cd']},
+    {id:'qt3',name:'Advanced Testing',topics:['performance','security','load testing','api testing']}
+  ],
+  'it-support':[
+    {id:'is1',name:'IT Support Basics',topics:['ticketing','hardware','software','networking','os']},
+    {id:'is2',name:'System Support',topics:['active directory','email','vpn','backup','antivirus']},
+    {id:'is3',name:'Advanced Support',topics:['cloud support','sla','remote support','automation']}
+  ],
+  'microservices':[
+    {id:'ms1',name:'Microservices Basics',topics:['architecture','rest','grpc','api gateway','service mesh']},
+    {id:'ms2',name:'Container & Orchestration',topics:['docker','kubernetes','helm','deployment','scaling']},
+    {id:'ms3',name:'Microservices Advanced',topics:['event driven','cqrs','saga','circuit breaker','observability']}
+  ],
+  'power-bi':[
+    {id:'pbi1',name:'Power BI Basics',topics:['dashboard','visuals','dax','data model','power query']},
+    {id:'pbi2',name:'Power BI Advanced',topics:['row level security','gateway','embedded','service','mobile']},
+    {id:'pbi3',name:'Power BI Analytics',topics:['ai visuals','forecasting','what if','parameters','performance']}
+  ],
+  'salesforce':[
+    {id:'sf1',name:'Salesforce Basics',topics:['objects','fields','records','security','profiles']},
+    {id:'sf2',name:'Salesforce Dev',topics:['apex','triggers','soql','visualforce','lightning']},
+    {id:'sf3',name:'Salesforce Advanced',topics:['lwc','integration','rest api','flow','process builder']}
+  ],
+  'agile-scrum':[
+    {id:'as1',name:'Agile Basics',topics:['agile manifesto','scrum','sprint','user stories','backlog']},
+    {id:'as2',name:'Scrum Roles',topics:['product owner','scrum master','dev team','ceremonies','artifacts']},
+    {id:'as3',name:'Agile Advanced',topics:['kanban','lean','safe','scaling','metrics']}
+  ]
+};
+
+/* ====== APP STATE ====== */
+var state = {
+  currentPage: 'home',
+  currentSkillId: null,
+  currentChallengeId: null,
+  currentQ: 0,
+  questions: [],
+  answers: {},
+  timeRemaining: 90*60,
+  timerInterval: null,
+  isPaused: false,
+  isSubmitted: false,
+  isStarted: false,
+  lastAnswerTime: Date.now(),
+  lastActivityTime: Date.now(),
+  inactivityCheckInterval: null,
+  inactivityLimit: 5*60,
+  certCanvas: null,
+  results: null,
+  certPicData: null
+};
+
+/* ====== HELPERS ====== */
+function showPage(id) {
+  var pages = document.querySelectorAll('.page');
+  for (var pi=0;pi<pages.length;pi++) pages[pi].classList.remove('active');
+  document.getElementById('page-'+id).classList.add('active');
+  state.currentPage = id;
+  var bb = document.getElementById('backBtn');
+  if (id === 'home') { bb.style.display='none' } else { bb.style.display='flex' }
+}
+
+function showToast(msg, type) {
+  type=type||'info'; var c=document.getElementById('toastC');
+  var t=document.createElement('div'); t.className='toast '+type; t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){t.remove()},300)},3000);
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show') }
+function openModal(id) { document.getElementById(id).classList.add('show') }
+
+function shuffle(arr) { var a=arr.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t} return a }
+
+function pad(n){return n<10?'0'+n:''+n}
+
+/* ====== QUESTION GENERATOR ====== */
+function genQuestions(skillId, challengeId) {
+  var challenges = CHALLENGES_DATA[skillId] || [];
+  var ch = null;
+  for (var i=0;i<challenges.length;i++){if(challenges[i].id===challengeId){ch=challenges[i];break}}
+  if (!ch) return [];
+  var topics = ch.topics;
+  var qs = [];
+  var used = {};
+  
+  var mcqQs = [
+    'What is the main function of {t} in {s}?',
+    'Which tool is used to test {t}?',
+    'What causes {t} to fail most often?',
+    'How do you diagnose {t} issues?',
+    'What is the standard specification for {t}?',
+    'Which component works with {t}?',
+    'What is a symptom of faulty {t}?',
+    'When should {t} be replaced?',
+    'Where is {t} typically located?',
+    'What safety measure applies to {t}?',
+    'Why is {t} important in {s}?',
+    'How often should {t} be checked?',
+    'What material is {t} made of?',
+    'Which voltage is used by {t}?',
+    'What happens when {t} overheats?'
+  ];
+  var mcqOpts = [
+    ['Data processing and control','Power distribution','Backup storage','External connection'],
+    ['Multimeter','Oscilloscope','Logic analyzer','Signal generator'],
+    ['Power surges','Software bugs','User error','Manufacturing defect'],
+    ['Visual inspection','Software scan','Audio test','Replacement'],
+    ['Industry standard 3.3V-5V','Variable range 12V','Fixed at 1.8V','No standard'],
+    ['Main processor','Cooling fan','Display unit','Memory module'],
+    ['Intermittent failure','Complete shutdown','Overheating','No power'],
+    ['After 3-5 years','When damaged','Monthly basis','Never'],
+    ['On main board','Inside PSU','Near display','In storage bay'],
+    ['Disconnect power','Wear gloves','Use plastic tools','Work wet'],
+    ['Core function','Optional add-on','Aesthetic only','Rarely used'],
+    ['Daily','Weekly','Monthly','Yearly'],
+    ['Conductive metal','Insulating plastic','Ceramic composite','Glass fiber'],
+    ['3.3V','5V','12V','Variable'],
+    ['Shuts down','Slows down','Increases speed','Changes color']
+  ];
+  var tfQs = [
+    '{t} requires regular maintenance.',
+    '{t} can be tested with a multimeter.',
+    'A damaged {t} causes system failure.',
+    '{t} can be repaired without replacement.',
+    'Static electricity damages {t}.',
+    '{t} is essential for {s} operation.',
+    '{t} should be handled by professionals.',
+    'Heat affects {t} performance.',
+    '{t} has improved in recent years.',
+    'Proper installation of {t} is critical.',
+    'Liquid damage ruins {t}.',
+    '{t} degrades over time.',
+    'A loose {t} connection causes errors.',
+    '{t} consumes significant power.',
+    '{t} must be replaced every year.'
+  ];
+  
+  /* Generate all unique MCQ pairs */
+  var mcqPool = [];
+  for (var ti=0;ti<topics.length;ti++) {
+    for (var mj=0;mj<mcqQs.length;mj++) {
+      var qt = mcqQs[mj].replace('{t}',topics[ti]).replace('{s}',skillId);
+      if (!used[qt]) {
+        used[qt]=true;
+        mcqPool.push({type:'mcq',q:qt,options:mcqOpts[mj].slice(),answer:mj%4});
+      }
+    }
+  }
+  mcqPool = shuffle(mcqPool);
+  for (var mi=0;mi<30&&mi<mcqPool.length;mi++) qs.push(mcqPool[mi]);
+  
+  /* Pad MCQs if still short (should not happen with 15 templates) */
+  var padIdx=0;
+  while (qs.length < 30) {
+    var t = topics[padIdx % topics.length];
+    var qt = 'What is the role of ' + t + ' in ' + skillId + '?';
+    if (!used[qt]) {
+      used[qt]=true;
+      qs.push({type:'mcq',q:qt,options:['Primary function','Secondary role','Support only','Not essential'],answer:padIdx%4});
+    }
+    padIdx++;
+  }
+  
+  /* Generate all unique TF pairs */
+  var tfPool = [];
+  for (var ti=0;ti<topics.length;ti++) {
+    for (var tj=0;tj<tfQs.length;tj++) {
+      var qt = tfQs[tj].replace('{t}',topics[ti]).replace('{s}',skillId);
+      if (!used[qt]) {
+        used[qt]=true;
+        tfPool.push({type:'tf',q:qt,options:['True','False'],answer:tj%2});
+      }
+    }
+  }
+  tfPool = shuffle(tfPool);
+  for (var fi=0;fi<20&&fi<tfPool.length;fi++) qs.push(tfPool[fi]);
+  
+  /* Pad TFs if still short */
+  padIdx=0;
+  while (qs.length < 50) {
+    var t = topics[padIdx % topics.length];
+    var qt = t + ' is vital for ' + skillId + ' systems.';
+    if (!used[qt]) {
+      used[qt]=true;
+      qs.push({type:'tf',q:qt,options:['True','False'],answer:padIdx%2});
+    }
+    padIdx++;
+  }
+  
+  return shuffle(qs);
+}
+
+/* ====== HOMEPAGE ====== */
+function renderHome() {
+  showPage('home');
+  var grid = document.getElementById('skillsGrid');
+  grid.innerHTML = '';
+  
+  animateCounter('statSkills', 50, 'Skills');
+  animateCounter('statChallenges', 183, 'Challenges');
+  animateCounter('statQuestions', 9150, 'Questions');
+  
+  var frag = document.createDocumentFragment();
+  for (var si=0;si<SKILLS_DATA.length;si++) {
+    var skill = SKILLS_DATA[si];
+    (function(skillRef){
+      var card = document.createElement('div');
+      card.className = 'skill-card' + (skillRef.noQ ? ' locked' : '') + ' reveal';
+      card.innerHTML = '<div class="skill-card-icon">' + skillRef.icon + '</div><div class="skill-card-name">' + skillRef.name + '</div>';
+      card.addEventListener('click', function(){
+        if (skillRef.noQ) { showToast('Cyber Security is under development. No questions yet.','info'); return }
+        openSkill(skillRef.id);
+      });
+      frag.appendChild(card);
+    })(skill);
+  }
+  grid.appendChild(frag);
+  observeReveal();
+  
+  /* Search - attach only once */
+  if (!window._searchAttached) {
+    window._searchAttached = true;
+    document.getElementById('searchInput').addEventListener('input', function(){
+      var q = this.value.toLowerCase().trim();
+      var cards = grid.children;
+      for (var i=0;i<cards.length;i++) {
+        var nameEl = cards[i].querySelector('.skill-card-name');
+        if (nameEl) {
+          cards[i].style.display = nameEl.textContent.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
+        }
+      }
+    });
+  }
+}
+
+document.getElementById('heroBtn').addEventListener('click', function(){
+  document.getElementById('skillsGrid').scrollIntoView({behavior:'smooth'});
+});
+
+/* ====== SKILL PAGE ====== */
+function openSkill(skillId) {
+  showPage('skill');
+  state.currentSkillId = skillId;
+  
+  var skill = null;
+  for (var i=0;i<SKILLS_DATA.length;i++){if(SKILLS_DATA[i].id===skillId){skill=SKILLS_DATA[i];break}}
+  if (!skill) return;
+  
+  var challenges = CHALLENGES_DATA[skillId] || [];
+  document.getElementById('skillHeader').innerHTML = '<span class="badge">' + skill.icon + ' ' + skill.name + '</span><h2>' + challenges.length + ' Challenges</h2>';
+  document.getElementById('skillDesc').textContent = skill.desc || '';
+  
+  var grid = document.getElementById('challengesGrid');
+  grid.innerHTML = '';
+  
+  if (challenges.length === 0) {
+    grid.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 2v20"/></svg><h3>No Challenges</h3><p>Coming soon.</p></div>';
+    return;
+  }
+  
+  challenges.forEach(function(ch){
+    var card = document.createElement('div');
+    card.className = 'challenge-card';
+    var stats = challengeStats(ch.id);
+    var attemptsStr = stats.attempts >= 1000 ? (stats.attempts/1000).toFixed(1).replace('.0','') + 'k' : stats.attempts;
+    var iconHtml = ch.icon ? '<span class="cc-icon">' + ch.icon + '</span>' : '';
+    card.innerHTML = '<div class="cc-head">' + iconHtml + '<h3>' + ch.name + '</h3></div><p>' + ch.topics.slice(0,3).join(', ') + '</p><div class="meta"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> 50 Questions</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 1h 30m</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> ' + stats.passRate + '%</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> ' + attemptsStr + '</span></div>';
+    card.addEventListener('click', function(){ startChallenge(skillId, ch.id); });
+    grid.appendChild(card);
+  });
+}
+
+function challengeStats(id){
+  var hash = 0;
+  for (var i=0;i<id.length;i++){ hash = ((hash << 5) - hash) + id.charCodeAt(i); hash |= 0; }
+  var seed = Math.abs(hash);
+  var attempts = 80 + (seed % 4920);
+  var passRate = 55 + (seed % 38);
+  return {attempts:attempts, passRate:passRate};
+}
+
+document.getElementById('backBtn').addEventListener('click', function(){
+  if (state.currentPage === 'skill') { renderHome(); observeReveal(); }
+  else if (state.currentPage === 'challenge') {
+    if (!state.isStarted) { renderHome(); observeReveal(); return; }
+    if (state.isSubmitted) { renderHome(); observeReveal(); return; }
+    if (!confirm('Exit challenge? Progress will be lost.')) return;
+    clearInterval(state.timerInterval);
+    clearInterval(state.inactivityCheckInterval);
+    state.isSubmitted = true;
+    renderHome();
+    observeReveal();
+  }
+});
+
+/* ====== CHALLENGE PAGE ====== */
+function startChallenge(skillId, challengeId) {
+  state.currentSkillId = skillId;
+  state.currentChallengeId = challengeId;
+  state.questions = genQuestions(skillId, challengeId);
+  state.currentQ = 0;
+  state.answers = {};
+  state.isSubmitted = false;
+  state.isPaused = false;
+  state.isStarted = false;
+  state.lastAnswerTime = Date.now();
+  state.lastActivityTime = Date.now();
+  state.timeRemaining = 90*60;
+  
+  showPage('challenge');
+  
+  /* Show pregame, hide exam */
+  document.getElementById('pregame').style.display = 'block';
+  document.getElementById('examArea').style.display = 'none';
+  document.getElementById('backBtn').style.display = 'flex';
+  
+  /* Fill pregame info */
+  var skill = null;
+  for (var i=0;i<SKILLS_DATA.length;i++){if(SKILLS_DATA[i].id===skillId){skill=SKILLS_DATA[i];break}}
+  document.getElementById('pregameIcon').innerHTML = skill ? skill.icon : '<svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 6 9 6 9z"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 18 9 18 9z"/><path d="M4 22h16"/><path d="M10 22V16"/><path d="M14 22V16"/><path d="M12 16v-4"/><path d="M8 12h8"/><path d="M12 12V9"/><path d="M12 9c-1 0-2-.5-2-2V5h4v2c0 1.5-1 2-2 2z"/></svg>';
+  document.getElementById('pregameTitle').textContent = challengeId;
+  var chs = CHALLENGES_DATA[skillId] || [];
+  var chName = challengeId;
+  for (var i=0;i<chs.length;i++){if(chs[i].id===challengeId){chName=chs[i].name;break}}
+  document.getElementById('pregameDesc').textContent = (skill?skill.name:'') + ' - ' + chName + ' - ' + state.questions.length + ' questions';
+}
+
+function beginChallenge() {
+  document.getElementById('pregame').style.display = 'none';
+  document.getElementById('examArea').style.display = 'block';
+  state.isStarted = true;
+  renderQuestion();
+  startTimer();
+  startInactivityCheck();
+}
+
+document.getElementById('startBtn').addEventListener('click', function(){ beginChallenge(); });
+
+function renderQuestion() {
+  var qs = state.questions;
+  var idx = state.currentQ;
+  if (idx < 0 || idx >= qs.length) return;
+  var q = qs[idx];
+  var answered = state.answers[idx];
+  var letters = ['A','B','C','D'];
+  
+  document.getElementById('qCounter').textContent = 'Question ' + (idx+1) + ' of ' + qs.length;
+  var ansCount = 0;
+  for (var k in state.answers) { if (state.answers.hasOwnProperty(k)) ansCount++; }
+  document.getElementById('answeredCount').textContent = ansCount + ' answered';
+  
+  var pct = qs.length ? (ansCount/qs.length)*100 : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  
+  var html = '';
+  html += '<div class="question-box">';
+  html += '<div class="q-num">Question ' + (idx+1) + ' of ' + qs.length + '</div>';
+  html += '<span class="q-type ' + (q.type==='mcq'?'mcq':'tf') + '">' + (q.type==='mcq'?'Multiple Choice':'True / False') + '</span>';
+  html += '<div class="q-text">' + q.q + '</div>';
+  html += '<div class="options">';
+  
+  for (var i=0;i<q.options.length;i++) {
+    var sel = (answered === i);
+    html += '<label class="option' + (sel?' selected':'') + '">';
+    html += '<input type="radio" name="q" value="' + i + '"' + (sel?' checked':'') + '>';
+    html += '<span class="letter">' + (letters[i]||i) + '</span>';
+    html += '<span>' + q.options[i] + '</span>';
+    html += '</label>';
+  }
+  html += '</div></div>';
+  
+  html += '<div class="actions">';
+  html += '<div>';
+  if (idx > 0) html += '<button class="btn btn-s" onclick="goQ('+(idx-1)+')">&larr; Previous</button>';
+  html += '</div><div>';
+  if (idx < qs.length-1) html += '<button class="btn btn-p" onclick="goQ('+(idx+1)+')">Next &rarr;</button>';
+  else html += '<button class="btn btn-g" onclick="confirmSubmit()">Submit</button>';
+  html += '</div></div>';
+  
+  document.getElementById('questionArea').innerHTML = html;
+  
+  /* Attach radio listeners */
+  var radios = document.querySelectorAll('.option input[type="radio"]');
+  for (var i=0;i<radios.length;i++) {
+    (function(radio){
+      radio.addEventListener('change', function(){
+        state.answers[state.currentQ] = parseInt(this.value);
+        state.lastActivityTime = Date.now();
+        /* Highlight */
+        var labels = document.querySelectorAll('.option');
+        for (var j=0;j<labels.length;j++) labels[j].classList.remove('selected');
+        this.closest('.option').classList.add('selected');
+        updateCounters();
+      });
+    })(radios[i]);
+  }
+}
+
+function updateCounters() {
+  var qs = state.questions;
+  if (!qs || !qs.length) return;
+  var ansCount = 0;
+  for (var k in state.answers) { if (state.answers.hasOwnProperty(k)) ansCount++; }
+  document.getElementById('answeredCount').textContent = ansCount + ' answered';
+  var pct = (ansCount / qs.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function goQ(idx) {
+  if (state.isSubmitted) return;
+  if (idx >=0 && idx < state.questions.length) {
+    state.currentQ = idx;
+    renderQuestion();
+  }
+}
+
+/* ====== TIMER ====== */
+function startTimer() {
+  clearInterval(state.timerInterval);
+  updateTimerDisplay();
+  state.timerInterval = setInterval(function(){
+    if (!state.isPaused && !state.isSubmitted) {
+      state.timeRemaining--;
+      updateTimerDisplay();
+      if (state.timeRemaining <= 0) {
+        clearInterval(state.timerInterval);
+        autoSubmit();
+      }
+    }
+  },1000);
+}
+
+function updateTimerDisplay() {
+  var el = document.getElementById('timerDisplay');
+  if (!el) return;
+  var h = Math.floor(state.timeRemaining/3600);
+  var m = Math.floor((state.timeRemaining%3600)/60);
+  var s = state.timeRemaining%60;
+  el.textContent = pad(h)+':'+pad(m)+':'+pad(s);
+  el.className = 'time';
+  if (state.timeRemaining < 300) el.classList.add('danger');
+  else if (state.timeRemaining < 600) el.classList.add('warn');
+}
+
+/* ====== ANTI-CHEAT ====== */
+/* Tab switch - auto-start after 10s away */
+var _awayTimer = null;
+document.addEventListener('visibilitychange', function(){
+  if (state.isSubmitted || state.currentPage !== 'challenge') return;
+  if (document.hidden && !state.isStarted) {
+    _awayTimer = setTimeout(function(){ beginChallenge(); }, 10000);
+  } else if (!document.hidden && _awayTimer) {
+    clearTimeout(_awayTimer);
+    _awayTimer = null;
+  }
+});
+window.addEventListener('blur', function(){
+  if (state.isSubmitted || state.currentPage !== 'challenge') return;
+  if (!state.isStarted && _awayTimer === null) {
+    _awayTimer = setTimeout(function(){ beginChallenge(); }, 10000);
+  }
+});
+window.addEventListener('focus', function(){
+  if (_awayTimer) { clearTimeout(_awayTimer); _awayTimer = null; }
+});
+
+/* Activity monitoring */
+var activityEvents = ['mousemove','mousedown','keydown','touchstart','scroll'];
+var _lastActUpdate = 0;
+for (var ei=0;ei<activityEvents.length;ei++) {
+  (function(evt){
+    document.addEventListener(evt, function(){
+      if (state.currentPage==='challenge') {
+        var now = Date.now();
+        if (now - _lastActUpdate > 2000 || evt !== 'mousemove') {
+          _lastActUpdate = now;
+          state.lastActivityTime = now;
+        }
+      }
+    });
+  })(activityEvents[ei]);
+}
+
+function startInactivityCheck() {
+  clearInterval(state.inactivityCheckInterval);
+  state.lastActivityTime = Date.now();
+  state.inactivityCheckInterval = setInterval(function(){
+    if (state.isSubmitted || state.isPaused || state.currentPage!=='challenge') return;
+    var inactive = Math.floor((Date.now() - state.lastActivityTime)/1000);
+    if (inactive >= state.inactivityLimit) {
+      showToast('Inactive too long. Challenge reset.','err');
+      resetChallenge();
+    }
+  },10000);
+}
+
+function resetChallenge() {
+  clearInterval(state.timerInterval);
+  clearInterval(state.inactivityCheckInterval);
+  state.answers = {};
+  state.currentQ = 0;
+  state.timeRemaining = 90*60;
+  state.isSubmitted = false;
+  state.questions = shuffle(state.questions);
+  renderQuestion();
+  updateTimerDisplay();
+  startTimer();
+  startInactivityCheck();
+  showToast('Challenge reset to question 1.','warn');
+}
+
+/* Keyboard nav */
+document.addEventListener('keydown', function(e){
+  if (state.isSubmitted || state.currentPage!=='challenge') return;
+  if (e.key==='ArrowLeft'){goQ(state.currentQ-1);e.preventDefault()}
+  if (e.key==='ArrowRight'){goQ(state.currentQ+1);e.preventDefault()}
+});
+
+/* ====== SUBMIT ====== */
+function confirmSubmit() {
+  var ans = 0;
+  for (var k in state.answers){if(state.answers.hasOwnProperty(k))ans++}
+  var total = state.questions.length;
+  if (ans < total) {
+    if (!confirm('You answered ' + ans + '/' + total + '. Unanswered = wrong. Submit?')) return;
+  } else {
+    if (!confirm('Submit your challenge?')) return;
+  }
+  submitChallenge();
+}
+
+function submitChallenge() {
+  state.isSubmitted = true;
+  clearInterval(state.timerInterval);
+  clearInterval(state.inactivityCheckInterval);
+  state.isPaused = true;
+  
+  var correct=0, wrong=0;
+  for (var i=0;i<state.questions.length;i++) {
+    if (state.answers[i]===undefined) wrong++;
+    else if (state.answers[i]===state.questions[i].answer) correct++;
+    else wrong++;
+  }
+  var total=state.questions.length;
+  var pct=total?Math.round((correct/total)*100):0;
+  var grade = pct>=90?'A+':pct>=80?'A':pct>=70?'B':pct>=60?'C':pct>=50?'D':'F';
+  var passed = pct >= 50;
+  var ver = 'B15-' + Math.random().toString(36).substr(2,10).toUpperCase();
+  
+  state.results = {
+    skillId: state.currentSkillId,
+    challengeId: state.currentChallengeId,
+    total:total, correct:correct, wrong:wrong,
+    percentage:pct, grade:grade, passed:passed,
+    verification:ver,
+    date: new Date().toISOString()
+  };
+  
+  showResults(state.results);
+}
+
+function autoSubmit() {
+  showToast('Time expired! Auto-submitting...','err');
+  submitChallenge();
+}
+
+function showResults(r) {
+  var skillName='', chalName='';
+  for (var i=0;i<SKILLS_DATA.length;i++){if(SKILLS_DATA[i].id===r.skillId){skillName=SKILLS_DATA[i].name;break}}
+  var chs = CHALLENGES_DATA[r.skillId]||[];
+  for (var i=0;i<chs.length;i++){if(chs[i].id===r.challengeId){chalName=chs[i].name;break}}
+  r.skillName = skillName;
+  r.challengeName = chalName;
+  
+  document.getElementById('resultsBody').innerHTML =
+    '<div class="r-grid">' +
+      '<div class="r-item ok"><div class="val">'+r.correct+'</div><div class="lbl">Correct</div></div>' +
+      '<div class="r-item no"><div class="val">'+r.wrong+'</div><div class="lbl">Wrong</div></div>' +
+      '<div class="r-item pct"><div class="val">'+r.percentage+'%</div><div class="lbl">Percentage</div></div>' +
+      '<div class="r-item grd"><div class="val">'+r.grade+'</div><div class="lbl">Grade</div></div>' +
+    '</div>' +
+    '<div class="r-status '+(r.passed?'pass':'fail')+'">' + (r.passed?'PASSED':'FAILED') + '</div>' +
+    '<div style="text-align:center;margin-top:12px;font-size:.85rem;color:#64748b;">Score: '+r.correct+'/'+r.total+'</div>';
+  
+  openModal('resultsModal');
+}
+
+/* ====== CERTIFICATE ====== */
+function openCertForm() {
+  closeModal('resultsModal');
+  document.getElementById('certForm').style.display='block';
+  document.getElementById('certDisplay').style.display='none';
+  document.getElementById('certFooter').style.display='none';
+  document.getElementById('certTitle').textContent='Generate Certificate';
+  document.getElementById('fName').value='';
+  document.getElementById('sName').value='';
+  document.getElementById('tName').value='';
+  document.getElementById('picFile').value='';
+  openModal('certModal');
+}
+
+function generateCert(e) {
+  e.preventDefault();
+  var f = document.getElementById('fName').value.trim();
+  var s = document.getElementById('sName').value.trim();
+  var t = document.getElementById('tName').value.trim();
+  if (!f||!s||!t){showToast('Fill all name fields.','warn');return}
+  var fullName = f+' '+s+' '+t;
+  
+  var picFile = document.getElementById('picFile').files[0];
+  if (picFile) {
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      state.certPicData = ev.target.result;
+      showCert(fullName);
+    };
+    reader.readAsDataURL(picFile);
+  } else {
+    state.certPicData = null;
+    showCert(fullName);
+  }
+}
+
+function showCert(fullName) {
+  document.getElementById('certForm').style.display='none';
+  document.getElementById('certDisplay').style.display='block';
+  document.getElementById('certFooter').style.display='flex';
+  document.getElementById('certTitle').textContent='Certificate of Achievement';
+  
+  var r = state.results;
+  var dateStr = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var imgHtml = state.certPicData
+    ? '<img src="'+state.certPicData+'" class="cert-img">'
+    : '<div class="cert-img" style="background:#f5f0e8;display:flex;align-items:center;justify-content:center;border-radius:50%"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#D4AF37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>';
+  
+  document.getElementById('certDisplay').innerHTML =
+    '<div class="cert-area">' +
+      '<div class="cert-area-inner">' +
+        '<div class="cert-corner tl"></div>' +
+        '<div class="cert-corner tr"></div>' +
+        '<div class="cert-corner bl"></div>' +
+        '<div class="cert-corner br"></div>' +
+        '<div class="cert-watermark">&#9733;</div>' +
+        '<div class="cert-ribbon">&#9733; Achievement &#9733;</div>' +
+        '<div class="cert-title">BATCH15 CHALLENGES</div>' +
+        '<div class="cert-sub">Certificate of Achievement</div>' +
+        '<div class="cert-award-badge"><svg viewBox="0 0 24 24" width="44" height="44" fill="#D4AF37" stroke="#D4AF37" stroke-width="1"><circle cx="12" cy="8" r="4.5" fill="#fff"/><path d="M8.5 12.5L6 21l6-3 6 3-2.5-8.5"/></svg></div>' +
+        imgHtml +
+        '<div class="cert-name">'+fullName+'</div>' +
+        '<div class="cert-detail">has successfully completed</div>' +
+        '<div class="cert-detail" style="font-size:1rem;font-weight:700;color:#D4AF37;margin:8px 0;letter-spacing:.5px;">'+r.challengeName+'</div>' +
+        '<div class="cert-detail">in <strong>'+r.skillName+'</strong></div>' +
+        '<div class="cert-bottom">' +
+          '<div class="cert-bottom-item"><div class="label">Score</div><div class="value">'+r.correct+' / '+r.total+'</div></div>' +
+          '<div class="cert-bottom-item"><div class="label">Percentage</div><div class="value">'+r.percentage+'%</div></div>' +
+          '<div class="cert-bottom-item"><div class="label">Grade</div><div class="value">'+r.grade+'</div></div>' +
+        '</div>' +
+        '<div class="cert-bottom" style="margin-top:16px;padding-top:16px;">' +
+          '<div class="cert-bottom-item"><div class="label">Date</div><div class="value">'+dateStr+'</div></div>' +
+          '<div class="cert-bottom-item"><div class="label">Signature</div><div class="sig">Batch15</div></div>' +
+          '<div class="cert-bottom-item"><div class="label">Verification</div><div class="value" style="font-size:.75rem;font-family:monospace;color:#999;">'+r.verification+'</div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cert-code">Batch15 Challenges &mdash; IT &amp; Computer Science Skills Platform</div>' +
+    '</div>';
+  
+  /* Generate canvas */
+  setTimeout(function(){ renderCertCanvas(fullName, state.certPicData, r); },200);
+}
+
+function renderCertCanvas(fullName, picData, r) {
+  var cv = document.createElement('canvas');
+  cv.width = 840;
+  cv.height = 580;
+  var ctx = cv.getContext('2d');
+  var GOLD = '#D4AF37';
+  
+  /* Background */
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,0,840,580);
+  
+  /* Outer gold border */
+  ctx.strokeStyle=GOLD;
+  ctx.lineWidth=5;
+  ctx.strokeRect(20,20,800,540);
+  
+  /* Inner gold border */
+  ctx.lineWidth=1.5;
+  ctx.strokeRect(32,32,776,516);
+  
+  /* Corner ornaments */
+  ctx.lineWidth=4;
+  ctx.strokeRect(26,26,20,20);
+  ctx.strokeRect(794,26,-20,20);
+  ctx.strokeRect(26,554,20,-20);
+  ctx.strokeRect(794,554,-20,-20);
+  
+  /* Gold ribbon bar */
+  var ribGrad = ctx.createLinearGradient(200,60,640,60);
+  ribGrad.addColorStop(0,GOLD);
+  ribGrad.addColorStop(0.5,'#f0d060');
+  ribGrad.addColorStop(1,GOLD);
+  ctx.fillStyle=ribGrad;
+  var rx=200, ry=52, rw=440, rh=28, rr=4;
+  ctx.beginPath();
+  ctx.moveTo(rx+rr,ry);
+  ctx.lineTo(rx+rw-rr,ry);
+  ctx.quadraticCurveTo(rx+rw,ry,rx+rw,ry+rr);
+  ctx.lineTo(rx+rw,ry+rh-rr);
+  ctx.quadraticCurveTo(rx+rw,ry+rh,rx+rw-rr,ry+rh);
+  ctx.lineTo(rx+rr,ry+rh);
+  ctx.quadraticCurveTo(rx,ry+rh,rx,ry+rh-rr);
+  ctx.lineTo(rx,ry+rr);
+  ctx.quadraticCurveTo(rx,ry,rx+rr,ry);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle='#111';
+  ctx.font='bold 13px Georgia,serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('★  ACHIEVEMENT  ★',420,66);
+  
+  /* Laurel watermark */
+  ctx.save();
+  ctx.fillStyle='rgba(212,175,55,0.06)';
+  ctx.font='100px Georgia,serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('★',420,290);
+  ctx.restore();
+  
+  /* Title */
+  ctx.fillStyle='#111';
+  ctx.font='bold 32px Georgia,serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='top';
+  ctx.fillText('BATCH15 CHALLENGES',420,90);
+  
+  ctx.fillStyle=GOLD;
+  ctx.font='bold 18px Georgia,serif';
+  ctx.fillText('Certificate of Achievement',420,128);
+  
+  /* Award badge */
+  ctx.save();
+  ctx.translate(420,170);
+  ctx.fillStyle=GOLD;
+  ctx.beginPath();
+  ctx.arc(0,0,24,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.beginPath();
+  ctx.arc(0,-6,12,0,Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle=GOLD;
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(-16,10);
+  ctx.lineTo(-20,28);
+  ctx.lineTo(0,20);
+  ctx.lineTo(20,28);
+  ctx.lineTo(16,10);
+  ctx.stroke();
+  ctx.restore();
+  
+  /* Photo or placeholder */
+  if (picData) {
+    var img = new Image();
+    img.onload = function(){
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(420,202,28,0,Math.PI*2);
+      ctx.clip();
+      ctx.drawImage(img,392,174,56,56);
+      ctx.restore();
+      ctx.strokeStyle=GOLD;
+      ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.arc(420,202,28,0,Math.PI*2);
+      ctx.stroke();
+      drawCertText(ctx,fullName,r);
+      state.certCanvas = cv;
+    };
+    img.src=picData;
+  } else {
+    ctx.fillStyle='#f5f0e8';
+    ctx.beginPath();
+    ctx.arc(420,202,28,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle=GOLD;
+    ctx.lineWidth=2.5;
+    ctx.beginPath();
+    ctx.arc(420,202,28,0,Math.PI*2);
+    ctx.stroke();
+    ctx.fillStyle='#D4AF37';
+    ctx.font='24px Georgia,serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('★',420,202);
+    drawCertText(ctx,fullName,r);
+    state.certCanvas = cv;
+  }
+}
+
+function drawCertText(ctx,fullName,r) {
+  var dateStr = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var GOLD = '#D4AF37';
+  
+  /* Name */
+  ctx.fillStyle='#111';
+  ctx.font='italic bold 28px Georgia,serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='top';
+  ctx.fillText(fullName,420,238);
+  
+  /* has completed */
+  ctx.fillStyle='#555';
+  ctx.font='16px Georgia,serif';
+  ctx.fillText('has successfully completed',420,278);
+  
+  /* Challenge name */
+  ctx.fillStyle=GOLD;
+  ctx.font='bold 20px Georgia,serif';
+  ctx.fillText(r.challengeName,420,306);
+  
+  /* Skill name */
+  ctx.fillStyle='#555';
+  ctx.font='16px Georgia,serif';
+  ctx.fillText('in ' + r.skillName,420,338);
+  
+  /* Stats row */
+  ctx.fillStyle='#111';
+  ctx.font='14px Georgia,serif';
+  ctx.fillText('Score: ' + r.correct + '/' + r.total + '    Percentage: ' + r.percentage + '%    Grade: ' + r.grade,420,380);
+  
+  /* Gold divider */
+  ctx.strokeStyle=GOLD;
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(180,410);
+  ctx.lineTo(660,410);
+  ctx.stroke();
+  
+  /* Bottom row: Date | Signature | Verification */
+  ctx.fillStyle='#999';
+  ctx.font='10px Arial,sans-serif';
+  ctx.textBaseline='top';
+  ctx.fillText('DATE',200,420);
+  ctx.fillText('SIGNATURE',420,420);
+  ctx.fillText('VERIFICATION',640,420);
+  
+  ctx.fillStyle='#111';
+  ctx.font='14px Georgia,serif';
+  ctx.fillText(dateStr,200,436);
+  ctx.font='italic 20px Georgia,serif';
+  ctx.fillText('Batch15',420,434);
+  ctx.font='11px monospace';
+  ctx.fillStyle='#999';
+  ctx.fillText(r.verification,640,436);
+  
+  /* Footer */
+  ctx.fillStyle='#bbb';
+  ctx.font='10px Arial,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('Batch15 Challenges — IT & Computer Science Skills Platform',420,550);
+}
+
+/* Certificate export */
+function downloadPNG(){
+  if(!state.certCanvas){showToast('Please wait...','info');return}
+  var a=document.createElement('a');
+  a.download='Batch15_Certificate.png';
+  a.href=state.certCanvas.toDataURL('image/png');
+  a.click();
+  showToast('Certificate downloaded.','ok');
+}
+function downloadPDF(){
+  if(!state.certCanvas){showToast('Please wait...','info');return}
+  var w=window.open('','_blank');
+  w.document.write('<html><head><title>Certificate</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;flex-direction:column}img{max-width:95%}@media print{body{margin:0}}</style></head><body>');
+  w.document.write('<img src="'+state.certCanvas.toDataURL('image/png')+'">');
+  w.document.write('<script>window.onload=function(){setTimeout(function(){window.print();window.close()},500)}<\/script></body></html>');
+  w.document.close();
+  showToast('Print dialog opens. Save as PDF.','info');
+}
+function printCert(){
+  if(!state.certCanvas){showToast('Please wait...','info');return}
+  var w=window.open('','_blank');
+  w.document.write('<html><head><title>Certificate</title><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh}img{max-width:100%}</style></head><body><img src="'+state.certCanvas.toDataURL('image/png')+'" onload="window.print();window.close()"></body></html>');
+  w.document.close();
+}
+function shareCert(){
+  if(!state.certCanvas){showToast('Please wait...','info');return}
+  if(navigator.share){
+    state.certCanvas.toBlob(function(b){
+      var f=new File([b],'Batch15_Certificate.png',{type:'image/png'});
+      navigator.share({title:'Batch15 Certificate',text:'I earned a certificate!',files:[f]}).catch(function(){});
+    });
+  } else {
+    downloadPNG();
+    showToast('Sharing unavailable. Downloaded instead.','info');
+  }
+}
+
+/* ====== BOOT ====== */
+var _revealObserver = new IntersectionObserver(function(entries){
+  for (var i=0;i<entries.length;i++) {
+    if (entries[i].isIntersecting) {
+      entries[i].target.classList.add('visible');
+      _revealObserver.unobserve(entries[i].target);
+    }
+  }
+}, {threshold:.1});
+function observeReveal(){
+  var els = document.querySelectorAll('.reveal:not(.visible)');
+  for (var i=0;i<els.length;i++) _revealObserver.observe(els[i]);
+}
+function animateCounter(elId, target, label){
+  var el = document.getElementById(elId);
+  if (el._counterInterval) { clearInterval(el._counterInterval); }
+  var current = 0;
+  var duration = 1200;
+  var startTime = Date.now();
+  el.textContent = '0+';
+  el._counterInterval = setInterval(function(){
+    var elapsed = Date.now() - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    current = Math.floor(progress * target);
+    if (current >= target) { current = target; clearInterval(el._counterInterval); el._counterInterval = null; }
+    el.textContent = current + '+';
+  }, 20);
+}
+
+/* Hero background slideshow */
+var _heroSlides = document.querySelectorAll('.hero-bg-slide');
+var _heroIdx = 0;
+if (_heroSlides.length > 0) {
+  _heroSlides[0].classList.add('active');
+  setInterval(function(){
+    _heroSlides[_heroIdx].classList.remove('active');
+    _heroIdx = (_heroIdx + 1) % _heroSlides.length;
+    _heroSlides[_heroIdx].classList.add('active');
+  }, 3500);
+}
+
+renderHome();
+observeReveal();
+</script>
+</body>
+</html>

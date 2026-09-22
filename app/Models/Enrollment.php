@@ -1,0 +1,13 @@
+<?php
+namespace App\Models;
+use App\Config\Database;
+class Enrollment {
+    public int $id; public int $user_id; public int $course_id; public string $status; public string $enrolled_at; public ?string $completed_at;
+    public function __construct(array $d) { $this->id=(int)$d["id"];$this->user_id=(int)$d["user_id"];$this->course_id=(int)$d["course_id"];$this->status=$d["status"];$this->enrolled_at=$d["enrolled_at"];$this->completed_at=$d["completed_at"]??null; }
+    public static function findById(int $id): ?self { $db=Database::getInstance();$stmt=$db->prepare("SELECT * FROM enrollments WHERE id=? LIMIT 1");$stmt->execute([$id]);$row=$stmt->fetch();return $row?new self($row):null; }
+    public static function findByUserAndCourse(int $uid,int $cid): ?self { $db=Database::getInstance();$stmt=$db->prepare("SELECT * FROM enrollments WHERE user_id=? AND course_id=? LIMIT 1");$stmt->execute([$uid,$cid]);$row=$stmt->fetch();return $row?new self($row):null; }
+    public static function findAll(array $filters=[],int $page=1,int $perPage=20): array { $db=Database::getInstance();$where=[];$params=[];if(!empty($filters["user_id"])){$where[]="user_id=?";$params[]=(int)$filters["user_id"];}if(!empty($filters["course_id"])){$where[]="course_id=?";$params[]=(int)$filters["course_id"];}if(!empty($filters["status"])){$where[]="status=?";$params[]=$filters["status"];}$wc=$where?"WHERE ".implode(" AND ",$where):"";$offset=($page-1)*$perPage;$stmt=$db->prepare("SELECT * FROM enrollments {$wc} ORDER BY enrolled_at DESC LIMIT ? OFFSET ?");$params[]=$perPage;$params[]=$offset;$stmt->execute($params);return array_map(fn($r)=>new self($r),$stmt->fetchAll()); }
+    public static function countAll(array $filters=[]): int { $db=Database::getInstance();$where=[];$params=[];if(!empty($filters["user_id"])){$where[]="user_id=?";$params[]=(int)$filters["user_id"];}if(!empty($filters["course_id"])){$where[]="course_id=?";$params[]=(int)$filters["course_id"];}if(!empty($filters["status"])){$where[]="status=?";$params[]=$filters["status"];}$wc=$where?"WHERE ".implode(" AND ",$where):"";$stmt=$db->prepare("SELECT COUNT(*) FROM enrollments {$wc}");$stmt->execute($params);return (int)$stmt->fetchColumn(); }
+    public static function create(array $d): self { $db=Database::getInstance();$stmt=$db->prepare("INSERT INTO enrollments (user_id,course_id,status) VALUES (?,?,?)");$stmt->execute([$d["user_id"],$d["course_id"],$d["status"]??"active"]);return self::findById((int)$db->lastInsertId()); }
+    public function toArray(): array { return ["id"=>$this->id,"user_id"=>$this->user_id,"course_id"=>$this->course_id,"status"=>$this->status,"enrolled_at"=>$this->enrolled_at,"completed_at"=>$this->completed_at]; }
+}

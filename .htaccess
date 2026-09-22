@@ -1,0 +1,23 @@
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|htm|php|js|css)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Pass Authorization header through to PHP (needed on Apache/CGI setups)
+  # X-Auth-Token is also sent as a fallback for setups that strip Authorization
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+  # Route /api/* requests to the API handler
+  RewriteRule ^api/(.*)$ api/index.php [QSA,L]
+
+  # SPA fallback: serve index.php for non-file/non-dir requests
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php [L]
+</IfModule>

@@ -1,0 +1,12 @@
+<?php
+namespace App\Models;
+use App\Config\Database;
+class Grade {
+    public int $id; public int $user_id; public int $course_id; public ?float $score; public ?string $letter_grade; public ?string $remarks; public int $graded_by; public string $created_at; public string $updated_at;
+    public function __construct(array $d) { $this->id=(int)$d["id"];$this->user_id=(int)$d["user_id"];$this->course_id=(int)$d["course_id"];$this->score=isset($d["score"])?(float)$d["score"]:null;$this->letter_grade=$d["letter_grade"]??null;$this->remarks=$d["remarks"]??null;$this->graded_by=(int)$d["graded_by"];$this->created_at=$d["created_at"];$this->updated_at=$d["updated_at"]??$d["created_at"]; }
+    public static function findById(int $id): ?self { $db=Database::getInstance();$stmt=$db->prepare("SELECT * FROM grades WHERE id=? LIMIT 1");$stmt->execute([$id]);$row=$stmt->fetch();return $row?new self($row):null; }
+    public static function findByUserAndCourse(int $uid,int $cid): ?self { $db=Database::getInstance();$stmt=$db->prepare("SELECT * FROM grades WHERE user_id=? AND course_id=? LIMIT 1");$stmt->execute([$uid,$cid]);$row=$stmt->fetch();return $row?new self($row):null; }
+    public static function findAll(array $filters=[],int $page=1,int $perPage=20): array { $db=Database::getInstance();$where=[];$params=[];if(!empty($filters["user_id"])){$where[]="user_id=?";$params[]=(int)$filters["user_id"];}if(!empty($filters["course_id"])){$where[]="course_id=?";$params[]=(int)$filters["course_id"];}$wc=$where?"WHERE ".implode(" AND ",$where):"";$offset=($page-1)*$perPage;$stmt=$db->prepare("SELECT * FROM grades {$wc} ORDER BY created_at DESC LIMIT ? OFFSET ?");$params[]=$perPage;$params[]=$offset;$stmt->execute($params);return array_map(fn($r)=>new self($r),$stmt->fetchAll()); }
+    public static function create(array $d): self { $db=Database::getInstance();$stmt=$db->prepare("INSERT INTO grades (user_id,course_id,score,letter_grade,remarks,graded_by) VALUES (?,?,?,?,?,?)");$stmt->execute([$d["user_id"],$d["course_id"],$d["score"]??null,$d["letter_grade"]??null,$d["remarks"]??null,$d["graded_by"]]);return self::findById((int)$db->lastInsertId()); }
+    public function toArray(): array { return ["id"=>$this->id,"user_id"=>$this->user_id,"course_id"=>$this->course_id,"score"=>$this->score,"letter_grade"=>$this->letter_grade,"remarks"=>$this->remarks,"graded_by"=>$this->graded_by,"created_at"=>$this->created_at]; }
+}

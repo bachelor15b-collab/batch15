@@ -1,0 +1,493 @@
+/* ============================================
+   Batch15 Challenges - Data Module
+   All skills, challenges, and question data
+   ============================================ */
+
+var SKILLS = [
+  { id:'cyber-security',     name:'Cyber Security',          icon:'\u{1F6E1}\uFE0F', description:'Protect systems and networks from digital attacks.', noQuestions: true },
+  { id:'mobile-repairing',   name:'Mobile Repairing',        icon:'\u{1F4F1}',        description:'Diagnose and fix mobile device hardware and software issues.' },
+  { id:'computer-repairing', name:'Computer Repairing',      icon:'\u{1F5A5}\uFE0F',  description:'Troubleshoot and repair computer hardware and software.' },
+  { id:'networking',         name:'Networking',              icon:'\u{1F5A7}\uFE0F',  description:'Design, implement, and manage computer networks.' },
+  { id:'programming',        name:'Programming',             icon:'\u{2328}\uFE0F',   description:'Write and maintain code in various programming languages.' },
+  { id:'database-admin',     name:'Database Administration', icon:'\u{1F4BE}',        description:'Manage and maintain database systems and data integrity.' },
+  { id:'web-development',    name:'Web Development',         icon:'\u{1F310}',        description:'Build and maintain websites and web applications.' },
+  { id:'software-eng',       name:'Software Engineering',    icon:'\u{1F4DD}',        description:'Apply engineering principles to software development.' },
+  { id:'cloud-computing',    name:'Cloud Computing',         icon:'\u2601\uFE0F',     description:'Deliver computing services over the internet.' },
+  { id:'ai',                 name:'Artificial Intelligence', icon:'\u{1F916}',        description:'Create intelligent systems that mimic human cognition.' },
+  { id:'machine-learning',   name:'Machine Learning',        icon:'\u{1F4CA}',        description:'Build systems that learn and improve from data.' },
+  { id:'data-science',       name:'Data Science',            icon:'\u{1F4C8}',        description:'Extract insights and knowledge from structured data.' },
+  { id:'ui-ux-design',       name:'UI/UX Design',            icon:'\u{1F3A8}',        description:'Design intuitive and engaging user interfaces.' },
+  { id:'graphic-design',     name:'Graphic Design',          icon:'\u{1F5BC}\uFE0F',  description:'Create visual content to communicate messages.' },
+  { id:'linux-admin',        name:'Linux Administration',    icon:'\u{1F427}',        description:'Manage and maintain Linux-based systems.' },
+  { id:'windows-admin',      name:'Windows Administration',  icon:'\u{1F4BB}',        description:'Administer Windows server and desktop environments.' },
+  { id:'devops',             name:'DevOps',                   icon:'\u{1F504}',        description:'Combine development and operations for faster delivery.' },
+  { id:'android-dev',        name:'Android Development',     icon:'\u{1F5A4}',        description:'Build applications for Android devices.' },
+  { id:'ios-dev',            name:'iOS Development',         icon:'\u{1F34F}',        description:'Create applications for Apple iOS devices.' },
+  { id:'ethical-hacking',    name:'Ethical Hacking',         icon:'\u{1F575}\uFE0F',  description:'Legally break into systems to test security.' },
+  { id:'iot',                name:'IoT',                     icon:'\u{1F4E1}',        description:'Connect physical devices to the internet.' },
+  { id:'embedded-systems',   name:'Embedded Systems',        icon:'\u{1FA93}',        description:'Design specialized computing systems.' },
+  { id:'api-dev',            name:'API Development',         icon:'\u{1F517}',        description:'Build and maintain application programming interfaces.' },
+  { id:'git-github',         name:'Git & GitHub',            icon:'\u{1F5C2}\uFE0F',  description:'Version control and collaborative code management.' },
+  { id:'project-mgmt',       name:'Project Management',      icon:'\u{1F4CB}',        description:'Plan, execute, and close projects effectively.' },
+  { id:'python',             name:'Python Programming',      icon:'\u{1F40D}',        description:'Write code using the Python programming language.' },
+  { id:'java',               name:'Java Programming',        icon:'\u2615',           description:'Develop applications using Java.' },
+  { id:'javascript',         name:'JavaScript Programming',  icon:'\u{1F4D6}',        description:'Build dynamic web content with JavaScript.' },
+  { id:'cpp',                name:'C++ Programming',         icon:'\u{1F4C4}',        description:'Write high-performance code in C++.' },
+  { id:'csharp',             name:'C# Programming',          icon:'\u{1F468}\u200D\u{1F4BB}', description:'Develop applications using C#.' },
+  { id:'php-dev',            name:'PHP Development',         icon:'\u{1F4F7}',        description:'Build server-side web applications with PHP.' },
+  { id:'ruby',               name:'Ruby Programming',        icon:'\u{1F48E}',        description:'Write elegant code with Ruby.' },
+  { id:'swift',              name:'Swift Programming',       icon:'\u{1F34E}',        description:'Develop iOS and macOS applications with Swift.' },
+  { id:'golang',             name:'Go Programming',          icon:'\u{1F40A}',        description:'Build efficient software with Go.' },
+  { id:'rust',               name:'Rust Programming',        icon:'\u{2699}\uFE0F',   description:'Write safe and fast code in Rust.' },
+  { id:'typescript',         name:'TypeScript',              icon:'\u{1F4DD}',        description:'Write typed JavaScript with TypeScript.' },
+  { id:'react-dev',          name:'React Development',       icon:'\u269B\uFE0F',     description:'Build user interfaces with React.' },
+  { id:'nodejs',             name:'Node.js Development',     icon:'\u{1F539}',        description:'Build server-side apps with Node.js.' },
+  { id:'angular',            name:'Angular Development',     icon:'\u{1F4CD}',        description:'Create dynamic web apps with Angular.' },
+  { id:'vuejs',              name:'Vue.js Development',      icon:'\u{1F5A4}',        description:'Build progressive web apps with Vue.js.' },
+  { id:'docker-kubernetes',  name:'Docker & Kubernetes',     icon:'\u{1F433}',        description:'Containerize and orchestrate applications.' },
+  { id:'aws',                name:'AWS Cloud',               icon:'\u2601\uFE0F',     description:'Leverage Amazon Web Services for cloud solutions.' },
+  { id:'azure',              name:'Microsoft Azure',         icon:'\u{1F4E6}',        description:'Use Microsoft cloud platform services.' },
+  { id:'gcp',                name:'Google Cloud Platform',   icon:'\u{1F30D}',        description:'Utilize Google cloud computing services.' },
+  { id:'blockchain',         name:'Blockchain Development',  icon:'\u{1F3DB}\uFE0F',  description:'Build decentralized applications and smart contracts.' },
+  { id:'game-dev',           name:'Game Development',        icon:'\u{1F3AE}',        description:'Create interactive games for various platforms.' },
+  { id:'ar-vr',              name:'AR/VR Development',       icon:'\u{1F453}',        description:'Build augmented and virtual reality experiences.' },
+  { id:'robotics',           name:'Robotics',                icon:'\u{1F916}',        description:'Design and program robotic systems.' },
+  { id:'big-data',           name:'Big Data',                icon:'\u{1F4CA}',        description:'Process and analyze large-scale data sets.' },
+  { id:'sys-admin',          name:'System Administration',   icon:'\u{1F5A5}\uFE0F',  description:'Manage and maintain IT infrastructure.' },
+  { id:'network-security',   name:'Network Security',        icon:'\u{1F6E1}\uFE0F',  description:'Protect network infrastructure from threats.' },
+  { id:'cryptography',       name:'Cryptography',            icon:'\u{1F512}',        description:'Secure communication through encryption.' },
+  { id:'digital-marketing',  name:'Digital Marketing',       icon:'\u{1F4F1}',        description:'Promote brands through digital channels.' },
+  { id:'seo',                name:'SEO',                     icon:'\u{1F50D}',        description:'Optimize websites for search engines.' },
+  { id:'computer-fund',      name:'Computer Fundamentals',   icon:'\u{1F4B0}',        description:'Understand basic computer concepts and operations.' }
+];
+
+var CHALLENGES = {
+  'mobile-repairing': [
+    { id:'keypad-repairing-01',  name:'Keypad Repairing 01',  topics:['keypad','buttons','keyboard matrix','flex cable','keypad ic','trackpad'] },
+    { id:'keypad-repairing-02',  name:'Keypad Repairing 02',  topics:['keypad','soldering','multimeter','short circuit','keypad controller'] },
+    { id:'keypad-repairing-03',  name:'Keypad Repairing 03',  topics:['keypad','water damage','corrosion','keypad replacement','testing'] },
+    { id:'android-repairing-01', name:'Android Repairing 01', topics:['android','screen replacement','battery','charging port','power ic'] },
+    { id:'android-repairing-02', name:'Android Repairing 02', topics:['android','motherboard','bga rework','cpu','emmc','thernal paste'] },
+    { id:'android-repairing-03', name:'Android Repairing 03', topics:['android','software','unlock','frp','firmware','bootloader'] },
+    { id:'iphone-repairing-01',  name:'iPhone Repairing 01',  topics:['iphone','screen','battery','charging ic','face id','touch id'] },
+    { id:'iphone-repairing-02',  name:'iPhone Repairing 02',  topics:['iphone','baseband','network ic','audio ic','power management'] },
+    { id:'iphone-repairing-03',  name:'iPhone Repairing 03',  topics:['iphone','microsoldering','board repair','water damage','component level'] },
+    { id:'computer-repairing-01',name:'Computer Repairing 01',topics:['computer','hardware','motherboard','cpu','ram','psu'] },
+    { id:'computer-repairing-02',name:'Computer Repairing 02',topics:['computer','storage','hdd','ssd','data recovery','raid'] },
+    { id:'computer-repairing-03',name:'Computer Repairing 03',topics:['computer','laptop','display','keyboard','thermal','fan'] }
+  ],
+  'computer-repairing': [
+    { id:'basic-hardware-01',  name:'Basic Hardware 01',  topics:['motherboard','cpu','ram','psu','case','cooling'] },
+    { id:'basic-hardware-02',  name:'Basic Hardware 02',  topics:['storage','hdd','ssd','optical drive','cables','ports'] },
+    { id:'basic-hardware-03',  name:'Basic Hardware 03',  topics:['gpu','expansion cards','bios','cmos','jumpers'] },
+    { id:'laptop-repair-01',   name:'Laptop Repair 01',   topics:['laptop','disassembly','screen','keyboard','touchpad','hinge'] },
+    { id:'laptop-repair-02',   name:'Laptop Repair 02',   topics:['laptop','power jack','dc jack','charging','battery','inverter'] },
+    { id:'troubleshooting-01', name:'Troubleshooting 01',  topics:['diagnostics','post','beep codes','error','blue screen','freeze'] }
+  ],
+  'networking': [
+    { id:'net-fundamentals-01', name:'Net Fundamentals 01', topics:['osi model','tcp ip','ip addressing','subnet','dns','dhcp'] },
+    { id:'net-fundamentals-02', name:'Net Fundamentals 02', topics:['routing','switching','vlan','nat','acl','firewall'] },
+    { id:'net-fundamentals-03', name:'Net Fundamentals 03', topics:['wireless','wifi','bluetooth','rf','antenna','signal'] },
+    { id:'cabling-01',         name:'Cabling & Connectors', topics:['ethernet','cable','rj45','fiber','coaxial','twisted pair'] },
+    { id:'network-devices-01', name:'Network Devices 01',   topics:['router','switch','hub','bridge','gateway','repeater'] }
+  ],
+  'programming': [
+    { id:'programming-basics-01', name:'Programming Basics 01', topics:['variables','data types','operators','control flow','loops'] },
+    { id:'programming-basics-02', name:'Programming Basics 02', topics:['functions','arrays','strings','pointers','recursion'] },
+    { id:'oop-01',                name:'OOP Concepts 01',        topics:['class','object','inheritance','polymorphism','encapsulation','abstraction'] },
+    { id:'ds-algo-01',            name:'Data Structures 01',     topics:['array','linked list','stack','queue','tree','graph'] },
+    { id:'ds-algo-02',            name:'Algorithms 01',          topics:['sorting','searching','dynamic programming','greedy','complexity'] }
+  ],
+  'database-admin': [
+    { id:'sql-basics-01', name:'SQL Basics 01', topics:['select','insert','update','delete','where','join'] },
+    { id:'sql-basics-02', name:'SQL Basics 02', topics:['group by','having','order by','subquery','index','view'] },
+    { id:'db-design-01',  name:'DB Design 01',  topics:['normalization','er diagram','primary key','foreign key','constraint','schema'] },
+    { id:'db-admin-01',   name:'DB Admin 01',   topics:['backup','restore','security','user','permission','transaction'] }
+  ],
+  'web-development': [
+    { id:'html-01',  name:'HTML Fundamentals', topics:['html','tags','forms','tables','semantic','attributes'] },
+    { id:'css-01',   name:'CSS Styling',       topics:['css','selectors','flexbox','grid','responsive','animation'] },
+    { id:'js-web-01',name:'JavaScript Web',    topics:['dom','events','fetch','ajax','local storage','promises'] },
+    { id:'frontend-01',name:'Frontend Dev',    topics:['react','vue','angular','sass','webpack','spa'] },
+    { id:'backend-01', name:'Backend Dev',     topics:['node','express','php','api','rest','middleware'] }
+  ],
+  'software-eng': [
+    { id:'sdlc-01',    name:'SDLC Models',     topics:['waterfall','agile','scrum','devops','v-model','iteration'] },
+    { id:'req-01',     name:'Requirements',    topics:['functional','non-functional','use case','user story','acceptance'] },
+    { id:'testing-01', name:'Testing',         topics:['unit test','integration','system','acceptance','tdd','regression'] },
+    { id:'design-01',  name:'Design Patterns', topics:['singleton','factory','observer','strategy','mvc','dependency'] }
+  ],
+  'cloud-computing': [
+    { id:'cloud-basics-01', name:'Cloud Basics 01',   topics:['iaas','paas','saas','public','private','hybrid'] },
+    { id:'cloud-basics-02', name:'Cloud Basics 02',   topics:['virtualization','hypervisor','scaling','load balancer','cdn'] },
+    { id:'cloud-deploy-01', name:'Cloud Deployment',  topics:['deployment','ci/cd','container','orchestration','terraform'] }
+  ],
+  'ai': [
+    { id:'ai-basics-01', name:'AI Fundamentals', topics:['neural network','deep learning','nlp','computer vision','turing test','agent'] },
+    { id:'ai-algo-01',   name:'AI Algorithms',   topics:['search','genetic','fuzzy logic','expert system','bayesian','reinforcement'] }
+  ],
+  'machine-learning': [
+    { id:'ml-basics-01', name:'ML Fundamentals',  topics:['supervised','unsupervised','regression','classification','clustering','overfitting'] },
+    { id:'ml-algo-01',   name:'ML Algorithms 01', topics:['linear regression','decision tree','svm','knn','k-means','naive bayes'] },
+    { id:'ml-algo-02',   name:'ML Algorithms 02', topics:['random forest','gradient boosting','pca','neural network','deep learning','cnn'] }
+  ],
+  'data-science': [
+    { id:'ds-basics-01', name:'Data Science Basics', topics:['pandas','numpy','visualization','statistics','probability','correlation'] },
+    { id:'ds-analysis-01',name:'Data Analysis',      topics:['cleaning','transformation','exploration','hypothesis','outlier','feature'] }
+  ],
+  'ui-ux-design': [
+    { id:'ui-basics-01', name:'UI Design Basics', topics:['color','typography','layout','alignment','contrast','hierarchy'] },
+    { id:'ux-basics-01', name:'UX Design Basics', topics:['user research','wireframe','prototype','usability','accessibility','persona'] },
+    { id:'ui-tools-01',  name:'Design Tools',     topics:['figma','sketch','adobe xd','photoshop','illustrator','invision'] }
+  ],
+  'graphic-design': [
+    { id:'gd-basics-01', name:'Design Fundamentals', topics:['composition','balance','proximity','color theory','typography','branding'] },
+    { id:'gd-software-01',name:'Design Software',    topics:['photoshop','illustrator','indesign','coreldraw','gimp','canva'] }
+  ],
+  'linux-admin': [
+    { id:'linux-basics-01', name:'Linux Basics 01',   topics:['commands','filesystem','permissions','users','groups','shell'] },
+    { id:'linux-basics-02', name:'Linux Basics 02',   topics:['bash scripting','cron','systemd','services','logging','process'] },
+    { id:'linux-admin-01',  name:'Linux Admin',       topics:['package mgmt','network config','firewall','selinux','lvm','raid'] }
+  ],
+  'windows-admin': [
+    { id:'win-basics-01', name:'Windows Basics 01', topics:['desktop','control panel','file explorer','users','groups','permissions'] },
+    { id:'win-admin-01',  name:'Windows Admin',     topics:['active directory','group policy','dns','dhcp','powershell','iis'] },
+    { id:'win-server-01', name:'Windows Server',    topics:['domain controller','fsmo','rds','wsus','backup','hyper-v'] }
+  ],
+  'devops': [
+    { id:'devops-basics-01', name:'DevOps Basics',   topics:['ci/cd','automation','monitoring','logging','infrastructure','agile'] },
+    { id:'devops-tools-01',  name:'DevOps Tools',    topics:['jenkins','gitlab ci','github actions','ansible','terraform','prometheus'] },
+    { id:'container-01',     name:'Containerization',topics:['docker','kubernetes','pod','service','deployment','helm'] }
+  ],
+  'android-dev': [
+    { id:'android-basics-01', name:'Android Basics 01', topics:['activity','fragment','layout','intent','manifest','resources'] },
+    { id:'android-basics-02', name:'Android Basics 02', topics:['recyclerview','navigation','room','viewmodel','livedata','coroutine'] },
+    { id:'android-adv-01',    name:'Android Advanced',  topics:['networking','firebase','dependency injection','testing','publishing'] }
+  ],
+  'ios-dev': [
+    { id:'ios-basics-01', name:'iOS Basics 01', topics:['swift','xcode','storyboard','view controller','delegate','table view'] },
+    { id:'ios-basics-02', name:'iOS Basics 02', topics:['auto layout','navigation','core data','networking','notification','app lifecycle'] },
+    { id:'ios-adv-01',    name:'iOS Advanced',  topics:['swiftui','combine','arkit','core ml','test flight','app store'] }
+  ],
+  'ethical-hacking': [
+    { id:'eh-basics-01', name:'Ethical Hacking Basics', topics:['footprinting','scanning','enumeration','exploitation','social engineering'] },
+    { id:'eh-tools-01',  name:'Hacking Tools',          topics:['nmap','metasploit','wireshark','burp suite','john','aircrack'] },
+    { id:'eh-adv-01',    name:'Advanced Hacking',       topics:['penetration testing','web app','wireless','reverse engineering','exploit dev'] }
+  ],
+  'iot': [
+    { id:'iot-basics-01', name:'IoT Fundamentals', topics:['sensors','actuators','microcontroller','arduino','raspberry pi','protocol'] },
+    { id:'iot-comm-01',   name:'IoT Communication', topics:['mqtt','coap','bluetooth','zigbee','wifi','lorawan'] },
+    { id:'iot-projects-01',name:'IoT Projects',     topics:['home automation','smart city','industrial','healthcare','agriculture'] }
+  ],
+  'embedded-systems': [
+    { id:'es-basics-01', name:'Embedded Basics',  topics:['microcontroller','microprocessor','rtos','gpio','interrupt','timer'] },
+    { id:'es-prog-01',   name:'Embedded Programming',topics:['c embedded','assembly','register','memory map','bootloader','firmware'] },
+    { id:'es-comm-01',   name:'Embedded Communication',topics:['i2c','spi','uart','can','usb','ethernet'] }
+  ],
+  'api-dev': [
+    { id:'api-basics-01', name:'API Basics',     topics:['rest','graphql','soap','http methods','status codes','authentication'] },
+    { id:'api-design-01', name:'API Design',     topics:['endpoints','versioning','pagination','rate limiting','error handling','documentation'] },
+    { id:'api-security-01',name:'API Security',  topics:['jwt','oauth','api key','cors','xss','csrf'] }
+  ],
+  'git-github': [
+    { id:'git-basics-01', name:'Git Basics 01',    topics:['init','add','commit','push','pull','clone'] },
+    { id:'git-basics-02', name:'Git Basics 02',    topics:['branch','merge','rebase','conflict','stash','tag'] },
+    { id:'github-01',     name:'GitHub Workflow',  topics:['pull request','fork','issue','actions','pages','code review'] }
+  ],
+  'project-mgmt': [
+    { id:'pm-basics-01', name:'PM Fundamentals', topics:['scope','schedule','cost','quality','risk','stakeholder'] },
+    { id:'pm-methods-01',name:'PM Methodologies',topics:['waterfall','agile','scrum','kanban','lean','prince2'] },
+    { id:'pm-tools-01',  name:'PM Tools',        topics:['jira','trello','ms project','asana','slack','confluence'] }
+  ],
+  'python': [
+    { id:'py-basics-01', name:'Python Basics 01', topics:['syntax','variables','lists','dicts','tuples','control flow'] },
+    { id:'py-basics-02', name:'Python Basics 02', topics:['functions','modules','packages','file i/o','exceptions','comprehensions'] },
+    { id:'py-adv-01',    name:'Python Advanced',  topics:['decorators','generators','context mgr','multithreading','async','metaclass'] }
+  ],
+  'java': [
+    { id:'java-basics-01', name:'Java Basics 01', topics:['jdk','jre','jvm','syntax','oop','data types'] },
+    { id:'java-basics-02', name:'Java Basics 02', topics:['inheritance','interface','abstract','collection','generics','exception'] },
+    { id:'java-adv-01',    name:'Java Advanced',  topics:['streams','lambda','reflection','annotation','jdbc','servlet'] }
+  ],
+  'javascript': [
+    { id:'js-basics-01', name:'JS Basics 01', topics:['variables','functions','objects','arrays','scope','closure'] },
+    { id:'js-basics-02', name:'JS Basics 02', topics:['prototype','this','callbacks','promises','async await','event loop'] },
+    { id:'js-adv-01',    name:'JS Advanced',  topics:['modules','proxy','reflect','symbols','iterators','generators'] }
+  ],
+  'cpp': [
+    { id:'cpp-basics-01', name:'C++ Basics 01', topics:['syntax','pointers','references','classes','inheritance','polymorphism'] },
+    { id:'cpp-basics-02', name:'C++ Basics 02', topics:['templates','stl','exceptions','smart pointers','move semantics','lambda'] },
+    { id:'cpp-adv-01',    name:'C++ Advanced',  topics:['memory mgmt','multi-threading','design patterns','optimization','metaprogramming'] }
+  ],
+  'csharp': [
+    { id:'csharp-basics-01', name:'C# Basics 01', topics:['syntax','oop','properties','events','delegates','linq'] },
+    { id:'csharp-basics-02', name:'C# Basics 02', topics:['async','task','generics','reflection','attributes','serialization'] },
+    { id:'csharp-adv-01',    name:'C# Advanced',  topics:['asp.net','entity','wpf','web api','signalr','dependency injection'] }
+  ],
+  'php-dev': [
+    { id:'php-basics-01', name:'PHP Basics 01', topics:['syntax','variables','arrays','sessions','cookies','forms'] },
+    { id:'php-basics-02', name:'PHP Basics 02', topics:['oop','pdo','mvc','routing','middleware','composer'] },
+    { id:'php-adv-01',    name:'PHP Advanced',  topics:['laravel','symfony','wordpress','security','optimization','testing'] }
+  ],
+  'ruby': [
+    { id:'ruby-basics-01', name:'Ruby Basics 01', topics:['syntax','objects','methods','arrays','hashes','blocks'] },
+    { id:'ruby-basics-02', name:'Ruby Basics 02', topics:['symbols','modules','mixins','metaprogramming','yield','enum'] },
+    { id:'ruby-adv-01',    name:'Ruby Advanced',  topics:['rails','active record','mvc','gem','testing','deployment'] }
+  ],
+  'swift': [
+    { id:'swift-basics-01', name:'Swift Basics 01', topics:['syntax','variables','optionals','functions','closures','struct'] },
+    { id:'swift-basics-02', name:'Swift Basics 02', topics:['protocol','extension','enum','error handling','generics','access control'] },
+    { id:'swift-adv-01',    name:'Swift Advanced',  topics:['swiftui','combine','async await','core data','networking','patterns'] }
+  ],
+  'golang': [
+    { id:'go-basics-01', name:'Go Basics 01', topics:['syntax','goroutines','channels','interfaces','structs','slices'] },
+    { id:'go-basics-02', name:'Go Basics 02', topics:['error handling','defer','testing','benchmark','json','http server'] },
+    { id:'go-adv-01',    name:'Go Advanced',  topics:['concurrency patterns','reflection','code generation','profiling','microservices'] }
+  ],
+  'rust': [
+    { id:'rust-basics-01', name:'Rust Basics 01', topics:['ownership','borrowing','lifetimes','structs','enums','pattern matching'] },
+    { id:'rust-basics-02', name:'Rust Basics 02', topics:['traits','generics','closures','iterators','error handling','modules'] },
+    { id:'rust-adv-01',    name:'Rust Advanced',  topics:['unsafe','ffi','macros','async','concurrency','cargo'] }
+  ],
+  'typescript': [
+    { id:'ts-basics-01', name:'TypeScript Basics', topics:['types','interfaces','classes','enums','generics','union'] },
+    { id:'ts-adv-01',    name:'TypeScript Advanced',topics:['mapped types','conditional types','decorators','module','declaration','utility'] }
+  ],
+  'react-dev': [
+    { id:'react-basics-01', name:'React Basics 01', topics:['jsx','components','props','state','hooks','events'] },
+    { id:'react-basics-02', name:'React Basics 02', topics:['useEffect','useContext','useReducer','custom hooks','forms','routing'] },
+    { id:'react-adv-01',    name:'React Advanced',  topics:['redux','performance','testing','next.js','ssr','suspense'] }
+  ],
+  'nodejs': [
+    { id:'node-basics-01', name:'Node.js Basics',  topics:['npm','modules','event loop','callbacks','streams','file system'] },
+    { id:'node-express-01',name:'Express.js',      topics:['routing','middleware','error handling','template','static files','rest api'] },
+    { id:'node-adv-01',    name:'Node.js Advanced',topics:['auth','websockets','clustering','worker threads','security','testing'] }
+  ],
+  'angular': [
+    { id:'angular-basics-01', name:'Angular Basics', topics:['components','modules','templates','directives','services','di'] },
+    { id:'angular-adv-01',    name:'Angular Advanced',topics:['routing','forms','http client','pipes','guards','rxjs'] }
+  ],
+  'vuejs': [
+    { id:'vue-basics-01', name:'Vue.js Basics', topics:['vue instance','template','directives','computed','watchers','components'] },
+    { id:'vue-adv-01',    name:'Vue.js Advanced',topics:['vuex','router','composition api','mixins','plugins','ssr'] }
+  ],
+  'docker-kubernetes': [
+    { id:'docker-basics-01',  name:'Docker Basics',     topics:['container','image','dockerfile','volume','network','compose'] },
+    { id:'k8s-basics-01',     name:'Kubernetes Basics', topics:['pod','deployment','service','configmap','secret','ingress'] },
+    { id:'container-adv-01',  name:'Container Advanced',topics:['helm','monitoring','scaling','security','registry','ci/cd'] }
+  ],
+  'aws': [
+    { id:'aws-basics-01', name:'AWS Basics', topics:['ec2','s3','rds','lambda','iam','vpc'] },
+    { id:'aws-adv-01',    name:'AWS Advanced',topics:['cloudfront','route53','dynamodb','elasticache','sns','sqs'] },
+    { id:'aws-arch-01',   name:'AWS Architecture',topics:['high availability','scaling','disaster recovery','cost optimization','security','serverless'] }
+  ],
+  'azure': [
+    { id:'azure-basics-01', name:'Azure Basics', topics:['vm','blob storage','sql database','function','aad','vnet'] },
+    { id:'azure-adv-01',    name:'Azure Advanced',topics:['devops','kubernetes','logic apps','cdn','key vault','monitor'] }
+  ],
+  'gcp': [
+    { id:'gcp-basics-01', name:'GCP Basics', topics:['compute engine','cloud storage','cloud sql','cloud function','iam','vpc'] },
+    { id:'gcp-adv-01',    name:'GCP Advanced',topics:['gke','bigquery','pub/sub','dataflow','cloud cdn','cloud armor'] }
+  ],
+  'blockchain': [
+    { id:'bc-basics-01', name:'Blockchain Basics', topics:['block','chain','consensus','mining','hash','ledger'] },
+    { id:'bc-dev-01',    name:'Blockchain Dev',    topics:['ethereum','smart contract','solidity','web3','dapp','token'] },
+    { id:'bc-adv-01',    name:'Blockchain Advanced',topics:['defi','nft','layer2','cryptography','scalability','governance'] }
+  ],
+  'game-dev': [
+    { id:'gd-basics-01', name:'Game Dev Basics',  topics:['unity','unreal','game loop','physics','collision','rendering'] },
+    { id:'gd-adv-01',    name:'Game Dev Advanced',topics:['ai in games','networking','optimization','animation','audio','shaders'] }
+  ],
+  'ar-vr': [
+    { id:'arvr-basics-01', name:'AR/VR Basics',  topics:['headset','tracking','rendering','stereoscopic','immersion','interaction'] },
+    { id:'arvr-dev-01',    name:'AR/VR Dev',     topics:['unity ar','arkit','arcore','webxr','3d modeling','lighting'] }
+  ],
+  'robotics': [
+    { id:'robo-basics-01', name:'Robotics Basics', topics:['sensors','actuators','control','kinematics','programming','ros'] },
+    { id:'robo-adv-01',    name:'Robotics Advanced',topics:['computer vision','autonomous','manipulation','slam','path planning'] }
+  ],
+  'big-data': [
+    { id:'bd-basics-01', name:'Big Data Basics', topics:['hadoop','spark','mapreduce','hdfs','nosql','data warehouse'] },
+    { id:'bd-adv-01',    name:'Big Data Advanced',topics:['kafka','flink','cassandra','hbase','elasticsearch','data lake'] }
+  ],
+  'sys-admin': [
+    { id:'sa-basics-01', name:'SysAdmin Basics', topics:['os','users','permissions','backup','monitoring','logging'] },
+    { id:'sa-adv-01',    name:'SysAdmin Advanced',topics:['automation','virtualization','high availability','disaster recovery','performance'] }
+  ],
+  'network-security': [
+    { id:'ns-basics-01', name:'NetSec Basics', topics:['firewall','ids','ips','vpn','acl','segmentation'] },
+    { id:'ns-adv-01',    name:'NetSec Advanced',topics:['siem','soar','threat hunting','forensics','zero trust','dlp'] }
+  ],
+  'cryptography': [
+    { id:'crypto-basics-01', name:'Crypto Basics', topics:['symmetric','asymmetric','hash','digital signature','certificate','pki'] },
+    { id:'crypto-adv-01',    name:'Crypto Advanced',topics:['aes','rsa','ecc','tls','quantum crypto','key exchange'] }
+  ],
+  'digital-marketing': [
+    { id:'dm-basics-01', name:'Digital Marketing Basics', topics:['social media','email','content','analytics','seo','ppc'] },
+    { id:'dm-adv-01',    name:'Digital Marketing Adv',    topics:['conversion','funnel','retargeting','influencer','automation','roi'] }
+  ],
+  'seo': [
+    { id:'seo-basics-01', name:'SEO Basics', topics:['keyword','on-page','off-page','backlink','meta tags','content'] },
+    { id:'seo-adv-01',    name:'SEO Advanced',topics:['technical seo','analytics','structured data','mobile','core web vitals','link building'] }
+  ],
+  'computer-fund': [
+    { id:'cf-basics-01', name:'Computer Basics 01', topics:['cpu','memory','storage','input','output','peripheral'] },
+    { id:'cf-basics-02', name:'Computer Basics 02', topics:['software','os','files','network','internet','security'] },
+    { id:'cf-adv-01',    name:'Computer Concepts',  topics:['binary','logic gates','number system','algorithm','programming','database'] }
+  ]
+};
+
+/* Question Templates */
+var QUESTION_TEMPLATES = {
+  mcq: [
+    { q:'What is the primary function of {topic} in {skill}?', opts:[
+      'To manage data flow and processing',
+      'To provide power to the system',
+      'To store backup information',
+      'To connect external peripherals'
+    ]},
+    { q:'Which tool is commonly used to test {topic}?', opts:[
+      'Multimeter',
+      'Oscilloscope',
+      'Logic Analyzer',
+      'Signal Generator'
+    ]},
+    { q:'What is a common symptom of a faulty {topic}?', opts:[
+      'Intermittent failure',
+      'Complete system shutdown',
+      'Overheating',
+      'No power at all'
+    ]},
+    { q:'When replacing {topic}, what safety precaution is most important?', opts:[
+      'Disconnect power source',
+      'Wear anti-static wrist strap',
+      'Use insulated tools',
+      'Work in a ventilated area'
+    }],
+    { q:'What is the standard voltage range for {topic}?', opts:[
+      '3.3V - 5V',
+      '12V - 24V',
+      '1.8V - 3.3V',
+      '5V - 12V'
+    ]},
+    { q:'Which component works closely with {topic}?', opts:[
+      'Microcontroller',
+      'Power supply unit',
+      'Cooling fan',
+      'Display panel'
+    ]},
+    { q:'How can you diagnose {topic} issues?', opts:[
+      'Visual inspection and testing',
+      'Only software diagnostics',
+      'By replacing the whole board',
+      'Using audio signals only'
+    ]},
+    { q:'What causes {topic} to fail most often?', opts:[
+      'Power surges and overheating',
+      'Software bugs',
+      'User error',
+      'Manufacturing defect'
+    ]},
+    { q:'Where is {topic} typically located?', opts:[
+      'On the main circuit board',
+      'Inside the power supply',
+      'Attached to the display',
+      'In the storage unit'
+    ]},
+    { q:'What is the lifespan of a typical {topic}?', opts:[
+      '3-5 years',
+      '1-2 years',
+      '5-10 years',
+      '10+ years'
+    ]}
+  ],
+  truefalse: [
+    '{topic} requires regular maintenance to function properly.',
+    '{topic} can be tested using a multimeter.',
+    'Replacing {topic} always requires professional equipment.',
+    '{topic} is essential for the normal operation of {skill}.',
+    'A damaged {topic} can cause complete system failure.',
+    '{topic} should only be handled by certified technicians.',
+    '{topic} issues can sometimes be fixed without replacement.',
+    'The cost of {topic} has decreased significantly in recent years.',
+    '{topic} is compatible with all versions of {skill}.',
+    'Static electricity can damage {topic}.'
+  ]
+};
+
+/* Question Generator */
+function generateQuestions(skillId, challengeId) {
+  const skill = SKILLS.find(s => s.id === skillId);
+  if (!skill || skill.noQuestions) return [];
+  
+  const skillChallenges = CHALLENGES[skillId] || [];
+  const challenge = skillChallenges.find(c => c.id === challengeId);
+  if (!challenge) return [];
+  
+  const topics = challenge.topics;
+  const questions = [];
+  const usedTexts = new Set();
+  
+  /* Generate MCQ questions */
+  let mcqIndex = 0;
+  while (questions.length < 30) {
+    const template = QUESTION_TEMPLATES.mcq[mcqIndex % QUESTION_TEMPLATES.mcq.length];
+    const topic = topics[mcqIndex % topics.length];
+    const qText = template.q.replace('{topic}', topic).replace('{skill}', skill.name);
+    
+    if (!usedTexts.has(qText)) {
+      usedTexts.add(qText);
+      const correctIdx = mcqIndex % 4;
+      const options = [...template.opts];
+      /* Shuffle options slightly but keep one correct */
+      questions.push({
+        type: 'mcq',
+        question: qText,
+        options: options,
+        answer: correctIdx
+      });
+    }
+    mcqIndex++;
+  }
+  
+  /* Generate True/False questions */
+  let tfIndex = 0;
+  while (questions.length < 52) {
+    const template = QUESTION_TEMPLATES.truefalse[tfIndex % QUESTION_TEMPLATES.truefalse.length];
+    const topic = topics[tfIndex % topics.length];
+    const qText = template.replace('{topic}', topic).replace('{skill}', skill.name);
+    
+    if (!usedTexts.has(qText)) {
+      usedTexts.add(qText);
+      questions.push({
+        type: 'truefalse',
+        question: qText,
+        options: ['True', 'False'],
+        answer: tfIndex % 2 === 0 ? 0 : 1
+      });
+    }
+    tfIndex++;
+  }
+  
+  return shuffleArray(questions);
+}
+
+/* Shuffle Array (Fisher-Yates) */
+function shuffleArray(arr) {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/* Get skill by ID */
+function getSkill(skillId) {
+  return SKILLS.find(s => s.id === skillId);
+}
+
+/* Get challenges for a skill */
+function getChallenges(skillId) {
+  return CHALLENGES[skillId] || [];
+}

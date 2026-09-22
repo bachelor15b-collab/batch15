@@ -1,0 +1,310 @@
+/* =============================================
+   Batch15Tube - Responsive Styles
+   ============================================= */
+
+@media (max-width: 1200px) {
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 72px;
+    }
+
+    .sidebar .sidebar-item span,
+    .sidebar .sidebar-divider {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 72px;
+    }
+
+    .header-center {
+        max-width: 400px;
+        margin: 0 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+    }
+
+    .sidebar .sidebar-item span,
+    .sidebar .sidebar-divider {
+        display: block;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
+
+    .header-center {
+        max-width: 200px;
+        margin: 0 12px;
+    }
+
+    .search-input {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .search-btn {
+        padding: 8px 14px;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .skill-hero {
+        padding: 32px 20px;
+    }
+
+    .skill-hero h1 {
+        font-size: 26px;
+    }
+
+    .categories-popup {
+        padding: 16px;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 8px;
+    }
+
+    .auth-container {
+        padding: 28px 20px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+    }
+
+    .video-page {
+        grid-template-columns: 1fr;
+    }
+
+    .playlist-sidebar {
+        max-height: none;
+        position: static;
+    }
+
+    .lang-popup {
+        padding: 28px 20px;
+    }
+
+    .restriction-popup {
+        padding: 32px 20px;
+    }
+
+    .restriction-popup h2 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header {
+        padding: 0 12px;
+    }
+
+    .header-left {
+        gap: 8px;
+    }
+
+    .logo-text {
+        display: none;
+    }
+
+    .header-center {
+        max-width: 140px;
+        margin: 0 8px;
+    }
+
+    .search-btn {
+        padding: 8px 12px;
+    }
+
+    .header-right {
+        gap: 4px;
+    }
+
+    .categories-btn {
+        display: none;
+    }
+
+    .video-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .video-title-lg {
+        font-size: 17px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .skills-carousel .skill-card {
+        width: 140px;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+
+    .category-card {
+        padding: 12px 8px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 360px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lang-choices {
+        gap: 8px;
+    }
+
+    .lang-choice {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 98;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+@media (min-width: 769px) {
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+/* RTL Support */
+[dir="rtl"] .sidebar {
+    left: auto;
+    right: 0;
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+}
+
+[dir="rtl"] .main-content {
+    margin-left: 0;
+    margin-right: var(--sidebar-width);
+}
+
+[dir="rtl"] .main-content.expanded {
+    margin-left: 0;
+    margin-right: 72px;
+}
+
+[dir="rtl"] .playlist-item {
+    border-left: none;
+    border-right: 3px solid transparent;
+}
+
+[dir="rtl"] .playlist-item.active {
+    border-right-color: var(--primary);
+}
+
+[dir="rtl"] .user-dropdown {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .lang-dropdown {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .toast-container {
+    right: auto;
+    left: 20px;
+}
+
+@keyframes slideInRTL {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+[dir="rtl"] .toast {
+    animation: slideInRTL 0.3s ease;
+}
+
+@media (max-width: 992px) {
+    [dir="rtl"] .main-content {
+        margin-right: 72px;
+    }
+}
+
+@media (max-width: 768px) {
+    [dir="rtl"] .sidebar {
+        transform: translateX(100%);
+    }
+
+    [dir="rtl"] .sidebar.open {
+        transform: translateX(0);
+    }
+
+    [dir="rtl"] .main-content {
+        margin-right: 0;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .main-header,
+    .sidebar,
+    .playlist-sidebar,
+    .video-actions,
+    .comment-form {
+        display: none !important;
+    }
+
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .video-player-wrapper {
+        break-inside: avoid;
+    }
+}

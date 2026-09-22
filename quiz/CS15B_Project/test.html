@@ -1,0 +1,13 @@
+<!DOCTYPE html><html><body>
+<div id="skillsGrid"></div>
+<script src="js/data.js"></script>
+<script>
+try {
+  console.log('SKILLS count:', SKILLS.length);
+  console.log('CHALLENGES keys:', Object.keys(CHALLENGES).length);
+  document.getElementById('skillsGrid').textContent = 'Skills loaded: ' + SKILLS.length + ', Challenges: ' + Object.keys(CHALLENGES).length;
+} catch(e) {
+  document.getElementById('skillsGrid').textContent = 'ERROR: ' + e.message;
+  console.error('Error:', e);
+}
+</script></body></html>
