@@ -2465,7 +2465,7 @@ h6 { font-size: 1.05rem; }
 .directory-hero { text-align: center; max-width: 760px; margin: 0 auto 36px; }
 .directory-hero-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
 .directory-hero-sub { color: var(--text-muted); font-size: 1rem; line-height: 1.7; }
-.directory-toolbar { border-radius: var(--radius-lg); }
+.directory-toolbar { border-radius: var(--radius-lg); margin-bottom: 28px; }
 .directory-search-row { display: flex; gap: 12px; align-items: center; }
 .directory-search {
   flex: 1; position: relative; min-width: 0;
