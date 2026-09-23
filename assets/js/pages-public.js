@@ -821,7 +821,7 @@ const PublicPages = {
     return `
       ${this.renderPublicNavbar()}
       <div class="public-page">
-        <section class="section reveal" style="padding-top:100px">
+        <section class="section" style="padding-top:100px">
           <div class="container">
             <div class="directory-hero">
               <h1 class="directory-hero-title">CS Batch 15-B <span class="text-accent">Profiles</span></h1>
