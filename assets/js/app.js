@@ -37,6 +37,7 @@ class Router {
   }
 
   _normalize(path) {
+    path = (path || '').split('?')[0];
     return '/' + path.replace(/^\/|\/$/g, '').split('/').filter(Boolean).join('/');
   }
 

@@ -82,7 +82,7 @@ class AuthController
 
     public static function login(): never
     {
-        RateLimitMiddleware::perIp(10, 60);
+        RateLimitMiddleware::perIp(10, 60, 'login');
         AuthToken::cleanupExpired();
 
         $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;

@@ -14,10 +14,10 @@ class RateLimitMiddleware
     /**
      * Apply rate limiting by IP address.
      */
-    public static function perIp(int $maxRequests = 60, int $windowSeconds = 60): void
+    public static function perIp(int $maxRequests = 60, int $windowSeconds = 60, string $scope = ''): void
     {
         $ip  = Security::getClientIp();
-        $key = 'ratelimit_ip_' . $ip;
+        $key = 'ratelimit_ip' . ($scope !== '' ? '_' . $scope : '') . '_' . $ip;
 
         $remaining = Security::checkRateLimit($key, $maxRequests, $windowSeconds);
 
