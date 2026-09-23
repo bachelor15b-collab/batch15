@@ -1349,24 +1349,9 @@ const Dashboards = {
 
         <!-- ============ PANEL: MEMBER APPROVALS ============ -->
         <div class="sa-panel" id="panel-members" style="display:none">
-          <div class="d-flex justify-between align-items-center mb-4">
-            <div>
-              <h4 class="fw-bold mb-1">Member Profile Approvals</h4>
-              <p class="text-sm text-tertiary">Review and approve/reject student member profiles</p>
-            </div>
-            <div class="d-flex gap-2">
-              <span class="text-sm text-tertiary" id="memberApprovalCount">0 pending</span>
-              <button class="btn btn-sm btn-ghost" onclick="loadMemberApprovals()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="table-container">
-              <table class="table table-sm">
-                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Level</th><th>Year</th><th>Submitted</th><th>Actions</th></tr></thead>
-                <tbody id="memberApprovalBody">
-                  <tr><td colspan="7" class="text-center text-tertiary py-4">Loading...</td></tr>
-                </tbody>
-              </table>
+          <div id="memberDirectoryRoot">
+            <div class="d-flex justify-between align-items-center mb-4">
+              <div class="text-sm text-tertiary">Loading member directory…</div>
             </div>
           </div>
         </div>
@@ -1933,24 +1918,9 @@ const Dashboards = {
 
         <!-- ============ PANEL: MEMBER APPROVALS ============ -->
         <div class="sa-panel" id="panel-members" style="display:none">
-          <div class="d-flex justify-between align-items-center mb-4">
-            <div>
-              <h4 class="fw-bold mb-1">Member Profile Approvals</h4>
-              <p class="text-sm text-tertiary">Review and approve/reject student member profiles</p>
-            </div>
-            <div class="d-flex gap-2">
-              <span class="text-sm text-tertiary" id="memberApprovalCount">0 pending</span>
-              <button class="btn btn-sm btn-ghost" onclick="loadMemberApprovals()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="table-container">
-              <table class="table table-sm">
-                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Level</th><th>Year</th><th>Submitted</th><th>Actions</th></tr></thead>
-                <tbody id="memberApprovalBody">
-                  <tr><td colspan="7" class="text-center text-tertiary py-4">Loading...</td></tr>
-                </tbody>
-              </table>
+          <div id="memberDirectoryRoot">
+            <div class="d-flex justify-between align-items-center mb-4">
+              <div class="text-sm text-tertiary">Loading member directory…</div>
             </div>
           </div>
         </div>
@@ -3171,24 +3141,9 @@ const Dashboards = {
 
         <!-- ============ PANEL: APPROVALS ============ -->
         <div class="sa-panel" id="panel-approvals" style="display:none">
-          <div class="d-flex justify-between align-items-center mb-4">
-            <div>
-              <h4 class="fw-bold mb-1">Member Profile Approvals</h4>
-              <p class="text-sm text-tertiary">Review and approve/reject student member profiles</p>
-            </div>
-            <div class="d-flex gap-2">
-              <span class="text-sm text-tertiary" id="memberApprovalCount">0 pending</span>
-              <button class="btn btn-sm btn-ghost" onclick="loadMemberApprovals()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="table-container">
-              <table class="table table-sm">
-                <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Level</th><th>Year</th><th>Submitted</th><th>Actions</th></tr></thead>
-                <tbody id="memberApprovalBody">
-                  <tr><td colspan="7" class="text-center text-tertiary py-4">Loading...</td></tr>
-                </tbody>
-              </table>
+          <div id="memberDirectoryRoot">
+            <div class="d-flex justify-between align-items-center mb-4">
+              <div class="text-sm text-tertiary">Loading member directory…</div>
             </div>
           </div>
         </div>
@@ -3299,11 +3254,11 @@ const _panelLoaders = {
   'blocked-ips': 'loadMonitorBlockedIps()',
   'monitor-users': 'loadMonitorUsers()',
   'soc-users': 'Dashboards._socLoadUsers()',
-  members: 'loadMemberApprovals()',
+  members: 'loadMemberDirectory()',
   'quiz-manage': 'loadQuizManagePanel()',
   'video-courses': 'loadVideoCoursesPanel()',
   'ops-users': 'loadOpsUsers()',
-  'approvals': 'loadMemberApprovals()',
+  'approvals': 'loadMemberDirectory()',
 };
 
 let _edCache = { users: [], courses: [], departments: [] };
@@ -4781,42 +4736,283 @@ async function deleteUser(id) {
   } catch(e) { UI.showToast('Error', e.message || 'Failed to delete user', 'error'); }
 }
 
-// ===== MEMBER APPROVAL FUNCTIONS =====
+// ===== MEMBER DIRECTORY (admin CRUD) =====
 
-async function loadMemberApprovals() {
-  const tbody = document.getElementById('memberApprovalBody');
-  if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="7" class="text-center text-tertiary py-4">Loading...</td></tr>';
+let _memberDir = { page: 1, per_page: 50, search: '', status: '', source: '', linked: '', sort: 'name' };
+let _memberDirUsers = [];
+
+async function loadMemberDirectory() {
+  const root = document.getElementById('memberDirectoryRoot');
+  if (!root) return;
+  root.innerHTML = '<div class="d-flex justify-between align-items-center mb-4"><div class="text-sm text-tertiary">Loading member directory\u2026</div></div>';
   try {
-    const res = await API.getMembers({ status: 'pending', per_page: 200 });
+    if (!_memberDirUsers.length) {
+      const u = await API.getUsers({ per_page: 200 });
+      _memberDirUsers = u.users || u.items || [];
+    }
+    root.innerHTML = memberDirShell();
+    await memberDirRefresh();
+  } catch (e) {
+    root.innerHTML = '<div class="text-center text-danger py-5">Failed to load member directory: ' + UI.escape(e.message) + '</div>';
+  }
+}
+
+function memberDirShell() {
+  const s = (filter, id, label) => `<option value="">${label}</option>${filter.map(v => `<option value="${UI.escape(v)}"${_memberDir[id] === v ? ' selected' : ''}>${UI.escape(v)}</option>`).join('')}`;
+  return `
+    <div class="d-flex justify-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h4 class="fw-bold mb-1">Member Directory</h4>
+        <p class="text-sm text-tertiary">Browse, search, and manage every member profile — roster entries, student submissions, and admins.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <span class="badge badge-primary" id="mdStatTotal">-</span>
+        <span class="badge badge-success" id="mdStatRoster">-</span>
+        <span class="badge badge-warning" id="mdStatPending">-</span>
+        <span class="badge badge-info" id="mdStatVerified">-</span>
+        <button class="btn btn-sm btn-ghost" onclick="loadMemberDirectory()" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="btn btn-primary btn-sm" onclick="memberDirEdit()"><i class="bi bi-person-plus"></i> Add member</button>
+      </div>
+    </div>
+    <div class="card mb-4">
+      <div class="p-4">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <div class="directory-search" style="flex:1;min-width:220px">
+            <i class="bi bi-search"></i>
+            <input type="text" id="memberDirSearch" placeholder="Search name, email, skill, interest..." value="${UI.escape(_memberDir.search)}" oninput="memberDirSearchDebounced(this.value)">
+          </div>
+          <select class="form-select" id="memberDirStatus" style="min-width:140px" onchange="_memberDir.status=this.value;_memberDir.page=1;memberDirRefresh()">
+            <option value="">All statuses</option>
+            ${['approved','pending','rejected'].map(v => `<option value="${v}"${_memberDir.status === v ? ' selected' : ''}>${v[0].toUpperCase() + v.slice(1)}</option>`).join('')}
+          </select>
+          <select class="form-select" id="memberDirSource" style="min-width:140px" onchange="_memberDir.source=this.value;_memberDir.page=1;memberDirRefresh()">
+            <option value="">All sources</option>
+            ${['roster','self','admin'].map(v => `<option value="${v}"${_memberDir.source === v ? ' selected' : ''}>${v[0].toUpperCase() + v.slice(1)}</option>`).join('')}
+          </select>
+          <select class="form-select" id="memberDirLinked" style="min-width:150px" onchange="_memberDir.linked=this.value;_memberDir.page=1;memberDirRefresh()">
+            <option value="">All linked status</option>
+            <option value="linked"${_memberDir.linked === 'linked' ? ' selected' : ''}>Has account</option>
+            <option value="unlinked"${_memberDir.linked === 'unlinked' ? ' selected' : ''}>No account</option>
+          </select>
+          <button class="btn btn-sm btn-ghost" onclick="memberDirResetFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-container">
+        <table class="table table-sm">
+          <thead><tr><th>Member</th><th>Level</th><th>Term</th><th>Source</th><th>Status</th><th>Account</th><th>Skills</th><th>Actions</th></tr></thead>
+          <tbody id="memberDirBody"><tr><td colspan="8" class="text-center text-tertiary py-4">Loading\u2026</td></tr></tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-between align-items-center p-3" id="memberDirPager" style="display:none">
+        <span class="text-sm text-tertiary" id="memberDirInfo"></span>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-ghost" onclick="_memberDir.page--;memberDirRefresh()" id="mdPrev">Prev</button>
+          <button class="btn btn-sm btn-ghost" onclick="_memberDir.page++;memberDirRefresh()" id="mdNext">Next</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function memberDirSearchDebounced(value) {
+  clearTimeout(_memberDir._t);
+  _memberDir._t = setTimeout(() => { _memberDir.search = value.trim(); _memberDir.page = 1; memberDirRefresh(); }, 350);
+}
+
+function memberDirResetFilters() {
+  _memberDir.search = ''; _memberDir.status = ''; _memberDir.source = ''; _memberDir.linked = ''; _memberDir.page = 1;
+  const root = document.getElementById('memberDirectoryRoot');
+  if (root) { root.innerHTML = memberDirShell(); }
+  memberDirRefresh();
+}
+
+async function memberDirRefresh() {
+  const tbody = document.getElementById('memberDirBody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" class="text-center text-tertiary py-4">Loading\u2026</td></tr>';
+  const params = { page: _memberDir.page, per_page: _memberDir.per_page, sort: _memberDir.sort === 'recent' ? 'recent' : undefined };
+  if (_memberDir.search) params.search = _memberDir.search;
+  if (_memberDir.status) params.status = _memberDir.status;
+  if (_memberDir.source) params.source = _memberDir.source;
+  if (_memberDir.linked === 'linked') params.has_account = '1';
+  if (_memberDir.linked === 'unlinked') params.has_account = '0';
+  try {
+    const res = await API.getMembers(params);
     const members = res.members || res.items || [];
-    const countEl = document.getElementById('memberApprovalCount');
-    if (countEl) countEl.textContent = members.length + ' pending';
+    const total = res.total || members.length;
+    memberDirStats();
     if (!members.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-tertiary py-4">No pending member profiles.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-tertiary py-4">No members found.</td></tr>';
       return;
     }
-    tbody.innerHTML = members.map(m => {
-      const name = [m.firstname, m.middlename, m.lastname].filter(Boolean).join(' ');
-      const email = m.email || m.user?.email || '-';
-      const submitted = m.created_at ? new Date(m.created_at).toLocaleDateString() : '-';
-      return '<tr>' +
-        '<td>' + m.id + '</td>' +
-        '<td>' + UI.escape(name) + '</td>' +
-        '<td class="text-sm">' + UI.escape(email) + '</td>' +
-        '<td>' + UI.escape(m.level || '-') + '</td>' +
-        '<td>' + UI.escape(m.year || '-') + '</td>' +
-        '<td class="text-sm text-tertiary">' + submitted + '</td>' +
-        '<td><div class="d-flex gap-1">' +
-          '<button class="btn btn-sm btn-success" onclick="approveMemberProfile(' + m.id + ')" title="Approve"><i class="bi bi-check-lg"></i> Approve</button>' +
-          '<button class="btn btn-sm btn-danger" onclick="rejectMemberProfile(' + m.id + ')" title="Reject"><i class="bi bi-x-lg"></i> Reject</button>' +
-        '</div></td>' +
-      '</tr>';
-    }).join('');
-  } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Error loading member profiles.</td></tr>';
-    console.error(e);
+    tbody.innerHTML = members.map(mdRow).join('');
+    const pager = document.getElementById('memberDirPager');
+    if (pager) {
+      pager.style.display = '';
+      const info = document.getElementById('memberDirInfo');
+      if (info) info.textContent = `Showing ${Math.min((_memberDir.page - 1) * _memberDir.per_page + 1, total)}–${Math.min(_memberDir.page * _memberDir.per_page, total)} of ${total}`;
+      document.getElementById('mdPrev').disabled = _memberDir.page <= 1;
+      document.getElementById('mdNext').disabled = _memberDir.page * _memberDir.per_page >= total;
+    }
+  } catch (e) {
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger py-4">Error: ' + UI.escape(e.message) + '</td></tr>';
   }
+}
+
+function mdRow(m) {
+  const name = m.full_name || [m.first_name, m.middle_name, m.last_name, m.username].filter(Boolean).join(' ') || ('Member #' + m.id);
+  const skillsArr = m.skills ? m.skills.split('\n').filter(Boolean) : [];
+  const statusBadge = { approved: 'success', pending: 'warning', rejected: 'danger' }[m.status] || 'gray';
+  const actionBtns =
+    '<button class="btn btn-sm btn-secondary" onclick="memberDirEdit(' + m.id + ')" title="Edit"><i class="bi bi-pencil"></i></button>' +
+    (m.status === 'pending' ? '<button class="btn btn-sm btn-success" onclick="approveMemberProfile(' + m.id + ')" title="Approve"><i class="bi bi-check-lg"></i></button><button class="btn btn-sm btn-danger" onclick="rejectMemberProfile(' + m.id + ')" title="Reject"><i class="bi bi-x-lg"></i></button>' : '') +
+    '<button class="btn btn-sm btn-danger" onclick="memberDirDelete(' + m.id + ',\'' + UI.escape(name).replace(/'/g, "\\'") + '\')" title="Delete"><i class="bi bi-trash"></i></button>';
+  return '<tr>' +
+    '<td><div class="d-flex align-items-center gap-2"><div class="md-avatar" style="background:' + mdGradient(name) + '">' + UI.getInitials(name) + '</div><div><div class="fw-semibold text-sm">' + UI.escape(name) + '</div><div class="text-xs text-tertiary">#' + m.id + (m.email ? ' · ' + UI.escape(m.email) : '') + '</div></div></div></td>' +
+    '<td>' + UI.escape(m.level || '-') + '</td>' +
+    '<td class="text-xs text-tertiary">' + ([m.year, m.semester].filter(Boolean).join(' ') || '-') + '</td>' +
+    '<td>' + UI.escape(m.source || '-') + '</td>' +
+    '<td>' + UI.badge(m.status, statusBadge) + '</td>' +
+    '<td>' + (m.has_account ? '<span class="badge badge-info"><i class="bi bi-patch-check"></i> ' + UI.escape(m.username || 'linked') + '</span>' : '<span class="text-xs text-tertiary">no account</span>') + '</td>' +
+    '<td class="text-xs text-secondary">' + (skillsArr.length ? UI.escape(skillsArr.slice(0, 2).join(', ')) + (skillsArr.length > 2 ? ' +' + (skillsArr.length - 2) : '') : '-') + '</td>' +
+    '<td><div class="d-flex gap-1">' + actionBtns + '</div></td>' +
+  '</tr>';
+}
+
+async function memberDirStats() {
+  try {
+    const [t, r, p, v] = await Promise.all([
+      API.getMembers({ per_page: 1 }),
+      API.getMembers({ source: 'roster', per_page: 1 }),
+      API.getMembers({ status: 'pending', per_page: 1 }),
+      API.getMembers({ has_account: '1', per_page: 1 }),
+    ]);
+    const set = (id, label, value) => { const el = document.getElementById(id); if (el) el.textContent = label + ' ' + value; };
+    set('mdStatTotal', 'Total', t.total || 0);
+    set('mdStatRoster', 'Roster', r.total || 0);
+    set('mdStatPending', 'Pending', p.total || 0);
+    set('mdStatVerified', 'Verified', v.total || 0);
+  } catch (e) {}
+}
+
+function mdGradient(name) {
+  const palettes = ['#2563EB', '#7c3aed', '#0d9488', '#dc2626', '#db2777', '#059669', '#ea580c', '#4f46e5'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return palettes[h % palettes.length];
+}
+
+function memberDirEdit(id) {
+  const modal = (m) => {
+    const field = (fid, label, value, ph, extra) => `
+      <div class="form-group">
+        <label class="form-label">${label}</label>
+        <input class="form-input" id="${fid}" value="${UI.escape(value || '')}" placeholder="${ph || ''}" ${extra || ''}>
+      </div>`;
+    const area = (fid, label, value, ph) => `
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">${label}</label>
+        <textarea class="form-textarea" id="${fid}" rows="2" placeholder="${ph || ''}">${UI.escape(value || '')}</textarea>
+      </div>`;
+    const usersOps = '<option value="">— no account —</option>' + _memberDirUsers.map(u => `<option value="${u.id}"${m && m.user_id == u.id ? ' selected' : ''}>${UI.escape(u.full_name || u.username || u.email)} (${UI.escape(u.role_slug || 'user')})</option>`).join('');
+    const body = `
+      <p class="text-sm text-tertiary mb-3">${m ? 'Edit member #' + m.id : 'Add a member to the directory. Link an account to mark it verified.'}</p>
+      <div class="form-grid">
+        ${field('mdFirst', 'First name *', m && m.first_name, 'First name')}
+        ${field('mdMiddle', 'Middle name', m && m.middle_name, 'Middle name')}
+        ${field('mdLast', 'Last name *', m && m.last_name, 'Last name')}
+        ${field('mdEmailContact', 'Contact email', m && m.email_contact, 'me@example.com')}
+        <div class="form-group"><label class="form-label">Level / tag</label><input class="form-input" id="mdLevel" value="${UI.escape((m && m.level) || '')}" placeholder="e.g. All rounder, Full-stack"></div>
+        <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><label class="form-label">Year</label><input class="form-input" id="mdYear" value="${UI.escape((m && m.year) || '')}" placeholder="Year 3"></div>
+          <div><label class="form-label">Semester</label><input class="form-input" id="mdSemester" value="${UI.escape((m && m.semester) || '')}" placeholder="Semester 5"></div>
+        </div>
+        ${area('mdBio', 'Bio', m && m.bio, 'Short professional bio')}
+        ${area('mdSkills', 'Skills / focus areas (one per line)', m && m.skills, 'JavaScript\nUI/UX')}
+        ${area('mdInterests', 'Interests (one per line)', m && m.interests, 'Cybersecurity\nPhotography')}
+        ${area('mdLanguages', 'Languages (one per line)', m && m.languages, 'Somali\nEnglish')}
+        ${area('mdCerts', 'Certificates (one per line)', m && m.certificates, 'Cisco CCNA')}
+        ${field('mdWebsite', 'Website', m && m.website, 'https://…')}
+        ${field('mdGithub', 'GitHub', m && m.github, 'username or URL')}
+        ${field('mdLinkedin', 'LinkedIn', m && m.linkedin, 'username or URL')}
+        ${field('mdTwitter', 'X / Twitter', m && m.twitter, 'username or URL')}
+        ${field('mdFacebook', 'Facebook', m && m.facebook, 'username or URL')}
+        ${field('mdInstagram', 'Instagram', m && m.instagram, 'username or URL')}
+        <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="mdStatus">${['approved','pending','rejected'].map(s => `<option value="${s}"${m && m.status === s ? ' selected' : ''}>${s[0].toUpperCase() + s.slice(1)}</option>`).join('')}</select></div>
+        <div class="form-group"><label class="form-label">Source</label><select class="form-select" id="mdSource">${['self','roster','admin'].map(s => `<option value="${s}"${m && m.source === s ? ' selected' : ''}>${s[0].toUpperCase() + s.slice(1)}</option>`).join('')}</select></div>
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Linked account</label><select class="form-select" id="mdLink">${usersOps}</select></div>
+        ${m && m.picture_url ? `<div class="form-group" style="grid-column:1/-1"><label class="form-label">Current picture</label><img src="${UI.escape(m.picture_url)}" alt="avatar" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1px solid var(--border-primary)"></div>` : ''}
+        <div class="form-group" style="grid-column:1/-1"><label class="form-label">Picture (JPG/PNG/WebP, max 2MB)</label><input type="file" class="form-input" id="mdPicture" accept="image/jpeg,image/png,image/gif,image/webp"></div>
+        <input type="hidden" id="mdHiddenId" value="${m ? m.id : ''}">
+      </div>`;
+    UI.showModal((m ? 'Edit member' : 'Add member'), body);
+  };
+  if (id) {
+    API.getMember(id).then(r => modal(r.member || r)).catch(e => UI.showToast('Error', e.message || 'Failed to load member', 'error'));
+  } else {
+    modal(null);
+  }
+}
+
+async function memberDirSave() {
+  const val = idv => { const el = document.getElementById(idv); return el ? el.value : ''; };
+  const first = val('mdFirst').trim();
+  const last = val('mdLast').trim();
+  if (!first || !last) { UI.showToast('Error', 'First and last name are required.', 'error'); return; }
+  const pick = (v) => { v = v.trim(); return v === '' ? null : v; };
+  let id = parseInt(val('mdHiddenId') || '0', 10);
+  const payload = {
+    first_name: first,
+    middle_name: pick(val('mdMiddle')) ,
+    last_name: last,
+    email_contact: pick(val('mdEmailContact')),
+    level: pick(val('mdLevel')),
+    year: pick(val('mdYear')),
+    semester: pick(val('mdSemester')),
+    bio: pick(val('mdBio')),
+    skills: pick(val('mdSkills')),
+    interests: pick(val('mdInterests')),
+    languages: pick(val('mdLanguages')),
+    certificates: pick(val('mdCerts')),
+    website: pick(val('mdWebsite')),
+    github: pick(val('mdGithub')),
+    linkedin: pick(val('mdLinkedin')),
+    twitter: pick(val('mdTwitter')),
+    facebook: pick(val('mdFacebook')),
+    instagram: pick(val('mdInstagram')),
+    status: val('mdStatus'),
+    source: val('mdSource'),
+    link_user_id: val('mdLink'),
+  };
+  const fileEl = document.getElementById('mdPicture');
+  try {
+    const res = id ? await API.updateMember(id, payload) : await API.createMember(payload);
+    const saved = res.member || res;
+    id = saved.id;
+    if (fileEl && fileEl.files && fileEl.files[0]) {
+      await API.uploadMemberPicture(id, fileEl.files[0]);
+    }
+    UI.showToast('Saved', id ? 'Member updated in the directory.' : 'Member added to the directory.', 'success');
+    UI.closeModal();
+    loadMemberDirectory();
+  } catch (e) {
+    const msg = (e.errors && Object.keys(e.errors).length) ? Object.values(e.errors)[0][0] : (e.message || 'Failed to save member');
+    UI.showToast('Error', msg, 'error');
+  }
+}
+
+function memberDirDelete(id, name) {
+  if (!confirm('Delete "' + (name || 'this member') + '"? This removes their directory entry permanently.')) return;
+  API.deleteMember(id)
+    .then(() => { UI.showToast('Deleted', 'Member removed from the directory.', 'info'); memberDirRefresh(); memberDirStats(); })
+    .catch(e => UI.showToast('Error', e.message || 'Failed to delete member', 'error'));
+}
+
+// Backwards-compatible alias used by approve/reject flows and old entry points
+async function loadMemberApprovals() {
+  await loadMemberDirectory();
 }
 
 async function approveMemberProfile(id) {
@@ -6137,7 +6333,7 @@ switchSuperAdminPanel = function(panel) {
   if (panel === 'elections') setTimeout(loadElectionsPanel, 50);
   if (panel === 'users') { populateUserTable(); populateRoleAssign(); }
   if (panel === 'monitor-users') setTimeout(loadMonitorUsers, 50);
-  if (panel === 'members') setTimeout(loadMemberApprovals, 50);
+  if (panel === 'members') setTimeout(loadMemberDirectory, 50);
   if (panel === 'messages') setTimeout(AppPages.messagingLoaded, 50);
   if (panel === 'notifications') setTimeout(AppPages.notificationsLoaded, 50);
   if (panel === 'access') setTimeout(loadModuleRestrictions, 50);
@@ -7373,6 +7569,14 @@ window.renderFileManager = renderFileManager;
 window.fmNavigateToFolder = fmNavigateToFolder;
 window.fmNavigateToRoot = fmNavigateToRoot;
 window.handleFmDrop = handleFmDrop;
+
+window.loadMemberDirectory = loadMemberDirectory;
+window.memberDirEdit = memberDirEdit;
+window.memberDirSave = memberDirSave;
+window.memberDirDelete = memberDirDelete;
+window.memberDirRefresh = memberDirRefresh;
+window.memberDirResetFilters = memberDirResetFilters;
+window.memberDirSearchDebounced = memberDirSearchDebounced;
 
 // Init all dashboard charts on window resize
 window.addEventListener('resize', () => {

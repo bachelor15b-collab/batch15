@@ -823,40 +823,35 @@ const PublicPages = {
       <div class="public-page">
         <section class="section reveal" style="padding-top:100px">
           <div class="container">
-            ${UI.section('BTCH 15-B Profiling', 'The official class directory of CS Batch 15-B — transcribed from the "BTCH 15-B Profiling" sheet. Browse each classmate\'s semester courses, learning style, programming ability, interests, and unique skills.')}
-            <div class="card p-3 mb-6">
-              <div class="d-flex gap-2 mb-3 flex-wrap align-items-end">
-                <div style="flex:1;min-width:220px">
-                  <label class="form-label">Search</label>
-                  <input type="text" class="form-input" placeholder="Search by name..." style="width:100%;padding:6px 14px;font-size:0.85rem" id="memberSearch" oninput="filterMembersBySearch()">
-                </div>
-                <div style="min-width:180px">
-                  <label class="form-label">Learning Style</label>
-                  <select class="form-select" id="memberStyleFilter" onchange="filterMembersBySearch()">
-                    <option value="">All learning styles</option>
-                    ${Array.from(new Set(BTCH15_MEMBERS.map(m => m.learningStyle).filter(Boolean))).sort().map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`).join('')}
-                  </select>
-                </div>
-                <div style="min-width:180px">
-                  <label class="form-label">Interest</label>
-                  <select class="form-select" id="memberInterestFilter" onchange="filterMembersBySearch()">
-                    <option value="">All interests</option>
-                    ${Array.from(new Set(BTCH15_MEMBERS.flatMap(m => m.interests || []).filter(Boolean))).sort().map(i => `<option value="${i.replace(/"/g, '&quot;')}">${i}</option>`).join('')}
-                  </select>
-                </div>
-                <div style="min-width:180px">
-                  <label class="form-label">Course</label>
-                  <select class="form-select" id="memberCourseFilter" onchange="filterMembersBySearch()">
-                    <option value="">All courses</option>
-                    ${Array.from(new Set(BTCH15_MEMBERS.flatMap(m => m.courses || []).filter(Boolean))).sort().map(c => `<option value="${c.replace(/"/g, '&quot;')}">${c}</option>`).join('')}
-                  </select>
-                </div>
-                <button class="btn btn-sm btn-ghost" onclick="document.getElementById('memberSearch').value='';document.getElementById('memberStyleFilter').value='';document.getElementById('memberInterestFilter').value='';document.getElementById('memberCourseFilter').value='';filterMembersBySearch()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
-              </div>
-              <div class="text-sm text-tertiary" id="membersCount"></div>
+            <div class="directory-hero">
+              <h1 class="directory-hero-title">CS Batch 15-B <span class="text-accent">Profiles</span></h1>
+              <p class="directory-hero-sub">Connect with your batchmates — skills, interests, languages, and links to everything they build and share.</p>
+              <div class="d-flex gap-2 flex-wrap justify-center" id="dirHeroStats"></div>
             </div>
+
+            <div class="card directory-toolbar p-4">
+              <div class="directory-search-row">
+                <div class="directory-search">
+                  <i class="bi bi-search"></i>
+                  <input type="text" id="memberSearch" placeholder="Search name, skill, interest..." oninput="memberSearchDebounced(this.value)">
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="resetMemberFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+              </div>
+              <div class="directory-filters">
+                <select id="memberLevelFilter" class="form-select" onchange="filterMembers()"><option value="">All levels</option></select>
+                <select id="memberSkillFilter" class="form-select" onchange="filterMembers()"><option value="">All skills</option></select>
+                <select id="memberInterestFilter" class="form-select" onchange="filterMembers()"><option value="">All interests</option></select>
+                <select id="memberLangFilter" class="form-select" onchange="filterMembers()"><option value="">All languages</option></select>
+                <button class="btn btn-sm btn-ghost" id="memberSortBtn" onclick="toggleMemberSort()"><i class="bi bi-sort-alpha-down"></i> <span id="memberSortLabel">Name</span></button>
+              </div>
+              <div class="text-sm text-tertiary mt-3" id="membersCount"></div>
+            </div>
+
             <div class="members-grid stagger-children" id="membersGrid">
               ${UI.skeleton('card', 8)}
+            </div>
+            <div class="text-center mt-4" id="memberLoadMore" style="display:none">
+              <button class="btn btn-outline btn-sm" onclick="memberLoadMore()"><i class="bi bi-plus-lg"></i> Load more</button>
             </div>
           </div>
         </section>
@@ -867,55 +862,23 @@ const PublicPages = {
   async membersLoaded() {
     const container = document.getElementById('membersGrid');
     if (!container) return;
-    const colors = ['#2563EB', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6', '#f97316'];
-    let members = BTCH15_MEMBERS.map(m => Object.assign({}, m, { source: 'profiling' }));
+    window._memberDir = { page: 1, per_page: 60, total: 0, sort: 'name' };
+
     try {
-      const res = await API.getMembers();
-      const dbMembers = (res.members || []).map(m => Object.assign({}, { id: 'db-' + m.id, source: 'platform', _db: m }));
-      window._allMembers = members.concat(dbMembers);
-    } catch(e) {
-      window._allMembers = members;
-    }
+      const facets = await API.getMemberFacets();
+      const set = (id, items) => {
+        const sel = document.getElementById(id);
+        if (!sel || !items) return;
+        items.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
+      };
+      set('memberLevelFilter', facets.levels);
+      set('memberSkillFilter', facets.skills);
+      set('memberInterestFilter', facets.interests);
+      set('memberLangFilter', facets.languages);
+    } catch (e) {}
 
-    const render = (list) => list.map((m, i) => {
-      if (m.source === 'platform') {
-        const db = m._db;
-        const dm = db.full_name || [db.first_name, db.middle_name, db.last_name].filter(Boolean).join(' ') || 'Unknown';
-        const skillsArr = db.skills ? db.skills.split('\n').filter(Boolean) : [];
-        return `
-          <div class="member-card stagger-item" data-name="${dm.toLowerCase()}" data-style="" data-interest="" data-course="" onclick="showMemberDetail('${m.id}')">
-            <div class="member-card-avatar" style="background:#1e3a5f">${UI.getInitials(dm)}</div>
-            <div class="member-card-name">${dm}</div>
-            ${db.level ? `<div class="member-card-role">${db.level}</div>` : ''}
-            <p class="member-card-bio">${db.bio || ''}</p>
-            <div class="d-flex flex-wrap gap-1 justify-center mt-2">${skillsArr.slice(0, 4).map(s => UI.badge(s, 'gray')).join('')}</div>
-            <div class="mt-3 pt-3" style="border-top:1px solid var(--border-primary)"><span class="text-xs text-tertiary"><i class="bi bi-person-badge"></i> Approved profile</span></div>
-          </div>
-        `;
-      }
-      const bgColor = colors[(m.id - 1) % colors.length];
-      const name = m.name || 'Unknown';
-      const interests = m.interests && m.interests.length ? m.interests.slice(0, 2) : [];
-      const courses = m.courses && m.courses.length ? m.courses.slice(0, 4) : [];
-      return `
-        <div class="member-card stagger-item" data-name="${name.toLowerCase()}" data-style="${(m.learningStyle || '').toLowerCase()}" data-interest="${interests.join('|').toLowerCase()}" data-course="${(courses.join('|')).toLowerCase()}" onclick="showMemberDetail(${m.id})">
-          <div class="member-card-avatar" style="background:${bgColor}">${UI.getInitials(name)}</div>
-          <div class="member-card-name">${name}</div>
-          ${m.learningStyle ? `<div class="member-card-role">${m.learningStyle}</div>` : `<div class="member-card-role text-tertiary">Learning style not recorded</div>`}
-          ${m.programming ? `<div class="member-card-role" style="color:var(--text-muted);font-size:0.78rem">Programming ability: ${m.programming}</div>` : ''}
-          <p class="member-card-bio">${interests.length ? interests.join(' · ') : (m.programming ? '' : 'No interests recorded')}</p>
-          ${courses.length ? `<div class="d-flex flex-wrap gap-1 justify-center mt-2">${courses.map(c => UI.badge(c, 'info')).join('')}</div>` : ''}
-          ${m.uniqueSkills && m.uniqueSkills.length ? `<div class="mt-3 pt-3" style="border-top:1px solid var(--border-primary)"><i class="bi bi-lightning-charge text-warning" style="font-size:0.75rem"></i> <span class="text-xs text-tertiary">${m.uniqueSkills[0]}${m.uniqueSkills.length > 1 ? ' +' + (m.uniqueSkills.length - 1) : ''}</span></div>` : ''}
-        </div>
-      `;
-    }).join('');
-
-    container.innerHTML = render(window._allMembers);
-    window._filteredMembers = window._allMembers.length;
-    const countEl = document.getElementById('membersCount');
-    if (countEl) countEl.innerHTML = `<i class="bi bi-people"></i> Showing <strong>${window._allMembers.length}</strong> of <strong>${window._allMembers.length}</strong> profiled members`;
-    UI.initCounters();
-    UI.initScrollReveal();
+    window._memberDir.sort = 'name';
+    await memberFetchAndRender();
   },
 
   contact() {
@@ -1004,29 +967,162 @@ function filterGallery(category) {
   setActiveFilter('galleryFilters', category);
 }
 
-// Member filter functions
-function filterMembersBySearch() {
-  const q = (document.getElementById('memberSearch').value || '').toLowerCase().trim();
-  const style = (document.getElementById('memberStyleFilter').value || '').toLowerCase();
-  const interest = (document.getElementById('memberInterestFilter').value || '').toLowerCase();
-  const course = (document.getElementById('memberCourseFilter').value || '').toLowerCase();
-  const items = document.querySelectorAll('#membersGrid .member-card');
-  let visible = 0;
-  items.forEach(item => {
-    const name = item.dataset.name || '';
-    const dStyle = item.dataset.style || '';
-    const dInterest = item.dataset.interest || '';
-    const dCourse = item.dataset.course || '';
-    const matchesName = !q || name.includes(q);
-    const matchesStyle = !style || dStyle.includes(style);
-    const matchesInterest = !interest || dInterest.split('|').some(i => i.includes(interest));
-    const matchesCourse = !course || dCourse.split('|').some(c => c.includes(course));
-    const show = matchesName && matchesStyle && matchesInterest && matchesCourse;
-    item.style.display = show ? '' : 'none';
-    if (show) visible++;
+// ——— Member directory (API-driven) ———
+function memberSearchDebounced(value) {
+  clearTimeout(window._memberDirSearchT);
+  window._memberDirSearchT = setTimeout(() => {
+    window._memberDir.query = (value || '').trim();
+    window._memberDir.page = 1;
+    memberFetchAndRender();
+  }, 350);
+}
+
+function resetMemberFilters() {
+  ['memberSearch', 'memberLevelFilter', 'memberSkillFilter', 'memberInterestFilter', 'memberLangFilter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
   });
+  window._memberDir.query = '';
+  window._memberDir.page = 1;
+  memberFetchAndRender();
+}
+
+function filterMembers() { window._memberDir.page = 1; memberFetchAndRender(); }
+
+function toggleMemberSort() { setMemberSort(window._memberDir.sort === 'name' ? 'recent' : 'name'); }
+
+function setMemberSort(s) {
+  window._memberDir.sort = s;
+  window._memberDir.page = 1;
+  const btn = document.getElementById('memberSortBtn');
+  if (btn) btn.innerHTML = (s === 'recent' ? '<i class="bi bi-clock-history"></i>' : '<i class="bi bi-sort-alpha-down"></i>') + ` <span>${s === 'recent' ? 'Recently added' : 'Name'}</span>`;
+  memberFetchAndRender();
+}
+
+async function memberFetchAndRender() {
+  const grid = document.getElementById('membersGrid');
   const countEl = document.getElementById('membersCount');
-  if (countEl) countEl.innerHTML = `<i class="bi bi-people"></i> Showing <strong>${visible}</strong> of <strong>${window._allMembers ? window._allMembers.length : 0}</strong> profiled members`;
+  if (!grid) return;
+  const d = window._memberDir;
+  const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  const params = { page: d.page, per_page: d.per_page, sort: d.sort };
+  if (d.query) params.search = d.query;
+  if (val('memberLevelFilter')) params.level = val('memberLevelFilter');
+  if (val('memberSkillFilter')) params.skills = val('memberSkillFilter');
+  if (val('memberInterestFilter')) params.interests = val('memberInterestFilter');
+  if (val('memberLangFilter')) params.language = val('memberLangFilter');
+
+  grid.classList.add('is-loading');
+  if (d.page === 1) grid.innerHTML = UI.skeleton('card', 8);
+  try {
+    const res = await API.getMembers(params);
+    const list = res.members || [];
+    d.total = res.total || list.length;
+    renderMemberGrid(list);
+    if (countEl) {
+      const filtered = d.query || params.level || params.skills || params.interests || params.language;
+      countEl.innerHTML = filtered
+        ? `<i class="bi bi-funnel"></i> <strong>${d.total}</strong> matching member${d.total === 1 ? '' : 's'}`
+        : `<i class="bi bi-people"></i> <strong>${d.total}</strong> batch member${d.total === 1 ? '' : 's'} in the directory`;
+    }
+    const moreBtn = document.getElementById('memberLoadMore');
+    if (moreBtn) moreBtn.style.display = d.total > d.page * d.per_page ? '' : 'none';
+  } catch (e) {
+    grid.innerHTML = `<div class="empty-state col-full"><i class="bi bi-wifi-off"></i><p>Couldn't load the directory — check your connection and retry.</p></div>`;
+    if (countEl) countEl.innerHTML = '';
+  } finally {
+    grid.classList.remove('is-loading');
+  }
+}
+
+function memberLoadMore() {
+  window._memberDir.per_page += 60;
+  memberFetchAndRender();
+}
+
+function renderMemberGrid(list) {
+  const grid = document.getElementById('membersGrid');
+  if (!grid) return;
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state col-full"><i class="bi bi-search"></i><p>No members match your filters.<br><span class="text-xs text-tertiary">Try clearing the search or choosing fewer filters.</span></p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map((db, i) => {
+    const name = db.full_name || [db.first_name, db.middle_name, db.last_name, db.username].filter(Boolean).join(' ') || ('Member #' + db.id);
+    const skillsArr = splitLines(db.skills);
+    const chips = skillsArr.slice(0, 3).map(s => `<span class="chip chip-sm">${esc(s)}</span>`).join('');
+    const extra = skillsArr.length > 3 ? `<span class="text-xs text-tertiary">+${skillsArr.length - 3}</span>` : '';
+    const socials = miniSocials(db);
+    return `
+      <div class="member-card stagger-item" style="animation-delay:${Math.min(i * 45, 600)}ms" onclick="showMemberDetail(${db.id})">
+        ${memberAvatarHtml(db, name)}
+        <div class="member-card-name">${esc(name)}</div>
+        <div class="member-card-role">${db.level ? esc(db.level) : ''}${db.year ? (db.level ? ' · ' : '') + esc(db.year) : ''}</div>
+        <p class="member-card-bio">${esc(clampText(db.bio, 110))}</p>
+        ${chips ? `<div class="member-chip-row">${chips}${extra}</div>` : ''}
+        ${socials ? `<div class="member-socials">${socials}</div>` : ''}
+        <div class="member-card-foot">
+          ${db.has_account ? `<span class="badge badge-success badge-sm"><i class="bi bi-patch-check"></i> Verified</span>` : `<span class="text-xs text-tertiary">Roster entry</span>`}
+          <span class="text-sm text-accent member-card-open">View profile <i class="bi bi-arrow-right"></i></span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  requestAnimationFrame(() => { if (window.UI && typeof UI.initScrollReveal === 'function') UI.initScrollReveal(); });
+}
+
+function memberAvatarHtml(db, name) {
+  return db.picture_url
+    ? `<div class="member-card-avatar"><img src="${db.picture_url}" alt="${esc(name)}" loading="lazy" onerror="this.parentElement.innerHTML='&lt;span&gt;${UI.getInitials(name)}&lt;/span&gt;';this.parentElement.style.background='${memberGradient(name)}'"><span class="avatar-fallback">${UI.getInitials(name)}</span></div>`
+    : `<div class="member-card-avatar" style="background:${memberGradient(name)}"><span>${UI.getInitials(name)}</span></div>`;
+}
+
+function memberGradient(name) {
+  const palettes = [
+    'linear-gradient(135deg,#2563EB,#7c3aed)',
+    'linear-gradient(135deg,#0d9488,#2563EB)',
+    'linear-gradient(135deg,#dc2626,#f59e0b)',
+    'linear-gradient(135deg,#db2777,#8b5cf6)',
+    'linear-gradient(135deg,#059669,#0ea5e9)',
+    'linear-gradient(135deg,#ea580c,#db2777)',
+    'linear-gradient(135deg,#4f46e5,#0ea5e9)',
+    'linear-gradient(135deg,#16a34a,#84cc16)',
+  ];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return palettes[h % palettes.length];
+}
+
+function splitLines(s) { return s ? String(s).split('\n').map(x => x.trim()).filter(Boolean) : []; }
+
+function clampText(s, n) {
+  if (!s) return '';
+  const t = String(s).replace(/\s+/g, ' ').trim();
+  return t.length > n ? t.slice(0, n).trimEnd() + '…' : t;
+}
+
+function miniSocials(db) {
+  const map = [
+    ['bi-globe2', 'website', 'Website'],
+    ['bi-github', 'github', 'GitHub'],
+    ['bi-linkedin', 'linkedin', 'LinkedIn'],
+    ['bi-twitter-x', 'twitter', 'X'],
+    ['bi-facebook', 'facebook', 'Facebook'],
+    ['bi-instagram', 'instagram', 'Instagram'],
+  ];
+  return map.filter(([ , key]) => db[key]).map(([icon, key, label]) =>
+    `<a href="${memberSocialUrl(key, db[key])}" title="${label}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="bi ${icon}"></i></a>`
+  ).join('');
+}
+
+function memberSocialUrl(key, value) {
+  const v = String(value).trim();
+  if (/^https?:\/\//i.test(v)) return v;
+  const prefixes = {
+    website: 'https://', github: 'https://github.com/', linkedin: 'https://linkedin.com/in/',
+    twitter: 'https://twitter.com/', facebook: 'https://facebook.com/', instagram: 'https://instagram.com/',
+  };
+  return (prefixes[key] || 'https://') + v.replace(/^@/, '');
 }
 
 function showProjectDetail(id) {
@@ -1053,57 +1149,61 @@ function showProjectDetail(id) {
   `);
 }
 
-function showMemberDetail(id) {
-  const members = window._allMembers || [];
-  const m = members.find(mem => mem.id === id || (mem._db && mem._db.id === id));
-  if (!m) return;
-  const colors = ['#2563EB', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#3b82f6', '#f97316'];
-  const color = colors[(m.id === 'db-' + id ? 0 : (parseInt(m.id) - 1)) % colors.length];
+async function showMemberDetail(id) {
+  let db;
+  try {
+    const res = await API.getMember(id);
+    db = res.member || res;
+  } catch (e) { UI.toast('Couldn\'t load that profile.', 'error'); return; }
+  if (!db || !db.id) return;
 
-  if (m.source === 'profiling') {
-    const name = m.name || 'Unknown';
-    const courses = m.courses && m.courses.length ? m.courses : [];
-    const interests = m.interests && m.interests.length ? m.interests : [];
-    const skills = m.uniqueSkills && m.uniqueSkills.length ? m.uniqueSkills : [];
-    UI.showModal(name, `
-      <div class="text-center mb-4">
-        <div class="avatar avatar-xl mx-auto" style="background:${color};width:80px;height:80px;font-size:1.75rem">${UI.getInitials(name)}</div>
-        <h4 class="mt-3 mb-1">${name}</h4>
-        ${m.learningStyle ? `<p class="text-sm text-secondary"><i class="bi bi-compass"></i> Learning style: ${m.learningStyle}</p>` : ''}
-        ${m.programming ? `<p class="text-xs text-tertiary"><i class="bi bi-code-slash"></i> Programming ability: ${m.programming}</p>` : ''}
+  const name = db.full_name || [db.first_name, db.middle_name, db.last_name].filter(Boolean).join(' ') || 'Member';
+  const skillsArr = splitLines(db.skills);
+  const languagesArr = splitLines(db.languages);
+  const interestsArr = splitLines(db.interests);
+  const certArr = splitLines(db.certificates);
+  const term = [db.year, db.semester].filter(Boolean).join(' — ');
+  const socials = [
+    ['bi-globe2', 'website', 'Website'],
+    ['bi-github', 'github', 'GitHub'],
+    ['bi-linkedin', 'linkedin', 'LinkedIn'],
+    ['bi-twitter-x', 'twitter', 'X'],
+    ['bi-facebook', 'facebook', 'Facebook'],
+    ['bi-instagram', 'instagram', 'Instagram'],
+  ].filter(([ , key]) => db[key]).map(([icon, key, label]) =>
+    `<a href="${memberSocialUrl(key, db[key])}" target="_blank" rel="noopener" class="btn btn-sm btn-secondary"><i class="bi ${icon}"></i> ${label}</a>`
+  ).join('');
+
+  UI.showModal(esc(name), `
+    <div class="profile-modal">
+      <div class="profile-modal-cover" style="background:${memberGradient(name)}">
+        ${db.picture_url
+          ? `<div class="profile-modal-avatar"><img src="${db.picture_url}" alt="${esc(name)}" onerror="this.closest('.profile-modal-avatar').outerHTML='&lt;div class=&quot;profile-modal-avatar&quot; style=&quot;background:${memberGradient(name)}&quot;&gt;${UI.getInitials(name)}&lt;/div&gt;'"></div>`
+          : `<div class="profile-modal-avatar" style="background:${memberGradient(name)}">${UI.getInitials(name)}</div>`}
       </div>
-      ${courses.length ? `<div class="mb-4"><h6 class="mb-2">Courses — This Semester</h6><div class="d-flex flex-wrap gap-2">${courses.map(c => UI.badge(c, 'info')).join('')}</div></div>` : ''}
-      ${interests.length ? `<div class="mb-4"><h6 class="mb-2">Interests</h6><div class="d-flex flex-wrap gap-2">${interests.map(i => UI.badge(i, 'success')).join('')}</div></div>` : ''}
-      ${skills.length ? `<div class="mb-4"><h6 class="mb-2">Unique Skills</h6>${skills.map(s => `<div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-lightning-charge text-warning" style="font-size:0.75rem"></i><span class="text-sm text-secondary">${s}</span></div>`).join('')}</div>` : ''}
-      <p class="text-xs text-tertiary mt-4 pt-3" style="border-top:1px solid var(--border-primary)"><i class="bi bi-journal-text"></i> Recorded in the official BTCH 15-B Profiling sheet. Empty fields mean the sheet listed "N/A".</p>
-    `);
-    return;
-  }
+      <div class="text-center mb-3">
+        <h4 class="mt-2 mb-1">${esc(name)}</h4>
+        <div class="d-flex gap-2 flex-wrap justify-center">
+          ${db.has_account ? '<span class="badge badge-success"><i class="bi bi-patch-check"></i> Verified member</span>' : '<span class="badge badge-gray">Roster entry</span>'}
+          ${db.level ? `<span class="badge badge-info">${esc(db.level)}</span>` : ''}
+          ${db.source === 'roster' ? '<span class="badge badge-primary">Official roster</span>' : ''}
+        </div>
+        ${term ? `<p class="text-xs text-tertiary mt-2"><i class="bi bi-mortarboard"></i> ${esc(term)}</p>` : ''}
+      </div>
 
-  const db = m._db || m;
-  const name = db.full_name || [db.first_name, db.middle_name, db.last_name].filter(Boolean).join(' ') || 'Unknown';
-  const skillsArr = db.skills ? db.skills.split('\n').filter(Boolean) : [];
-  const languagesArr = db.languages ? db.languages.split('\n').filter(Boolean) : [];
-  const certArr = db.certificates ? db.certificates.split('\n').filter(Boolean) : [];
-  const socialLinks = [];
-  if (db.github) socialLinks.push(`<a href="${db.github.startsWith('http')?db.github:'https://github.com/'+db.github}" target="_blank" class="btn btn-sm btn-secondary"><i class="bi bi-github"></i> GitHub</a>`);
-  if (db.linkedin) socialLinks.push(`<a href="${db.linkedin.startsWith('http')?db.linkedin:'https://linkedin.com/in/'+db.linkedin}" target="_blank" class="btn btn-sm btn-secondary"><i class="bi bi-linkedin"></i> LinkedIn</a>`);
-  if (db.twitter) socialLinks.push(`<a href="${db.twitter.startsWith('http')?db.twitter:'https://twitter.com/'+db.twitter.replace('@','')}" target="_blank" class="btn btn-sm btn-secondary"><i class="bi bi-twitter-x"></i> Twitter</a>`);
-  if (db.website) socialLinks.push(`<a href="${db.website.startsWith('http')?db.website:'https://'+db.website}" target="_blank" class="btn btn-sm btn-secondary"><i class="bi bi-globe2"></i> Website</a>`);
-  UI.showModal(name, `
-    <div class="text-center mb-4">
-      ${db.picture_url
-        ? `<div style="width:80px;height:80px;border-radius:50%;overflow:hidden;margin:0 auto"><img src="${db.picture_url}" alt="${name}" style="width:100%;height:100%;object-fit:cover"></div>`
-        : `<div class="avatar avatar-xl mx-auto" style="background:${color};width:80px;height:80px;font-size:1.75rem">${UI.getInitials(name)}</div>`}
-      <h4 class="mt-3 mb-1">${name}</h4>
-      ${db.level ? `<p class="text-sm text-secondary">${db.level}</p>` : ''}
-      ${db.year ? `<p class="text-xs text-tertiary">${db.year}${db.semester ? ' — ' + db.semester : ''}</p>` : ''}
+      ${db.bio ? `<div class="mb-4"><h6 class="member-modal-label">About</h6><p class="text-sm text-secondary" style="line-height:1.8">${esc(db.bio)}</p></div>` : ''}
+
+      ${skillsArr.length ? `<div class="mb-4"><h6 class="member-modal-label"><i class="bi bi-lightning-charge"></i> Skills & focus areas</h6><div class="d-flex flex-wrap gap-2">${skillsArr.map(s => `<span class="chip chip-sm chip-info">${esc(s)}</span>`).join('')}</div></div>` : ''}
+
+      ${interestsArr.length ? `<div class="mb-4"><h6 class="member-modal-label"><i class="bi bi-heart"></i> Interests</h6><div class="d-flex flex-wrap gap-2">${interestsArr.map(i => `<span class="chip chip-sm chip-success">${esc(i)}</span>`).join('')}</div></div>` : ''}
+
+      ${languagesArr.length ? `<div class="mb-4"><h6 class="member-modal-label"><i class="bi bi-translate"></i> Languages</h6><div class="d-flex flex-wrap gap-2">${languagesArr.map(l => `<span class="chip chip-sm">${esc(l)}</span>`).join('')}</div></div>` : ''}
+
+      ${certArr.length ? `<div class="mb-4"><h6 class="member-modal-label"><i class="bi bi-trophy"></i> Certificates & achievements</h6>${certArr.map(c => `<div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-patch-check text-accent" style="font-size:0.75rem"></i><span class="text-sm text-secondary">${esc(c)}</span></div>`).join('')}</div>` : ''}
+
+      ${db.email || db.email_contact ? `<div class="mb-4"><h6 class="member-modal-label"><i class="bi bi-envelope"></i> Contact</h6>${db.email ? `<p class="text-sm text-secondary mb-1"><i class="bi bi-envelope"></i> ${esc(db.email)}</p>` : ''}${db.email_contact ? `<p class="text-sm text-secondary"><i class="bi bi-envelope-open"></i> ${esc(db.email_contact)}</p>` : ''}</div>` : ''}
+
+      ${socials ? `<div class="d-flex flex-wrap gap-2 mt-4 pt-4" style="border-top:1px solid var(--border-primary)">${socials}</div>` : ''}
     </div>
-    ${db.bio ? `<div class="mb-4"><h6 class="mb-2">About</h6><p class="text-sm text-secondary" style="line-height:1.8">${db.bio}</p></div>` : ''}
-    ${skillsArr.length ? `<div class="mb-4"><h6 class="mb-2">Skills</h6><div class="d-flex flex-wrap gap-2">${skillsArr.map(s => UI.badge(s, 'info')).join('')}</div></div>` : ''}
-    ${languagesArr.length ? `<div class="mb-4"><h6 class="mb-2">Languages</h6><div class="d-flex flex-wrap gap-2">${languagesArr.map(l => UI.badge(l, 'success')).join('')}</div></div>` : ''}
-    ${certArr.length ? `<div class="mb-4"><h6 class="mb-2">Certificates & Achievements</h6>${certArr.map(c => `<div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-trophy text-warning" style="font-size:0.75rem"></i><span class="text-sm text-secondary">${c}</span></div>`).join('')}</div>` : ''}
-    ${db.email || db.email_contact ? `<div class="mb-3"><h6 class="mb-2">Contact</h6>${db.email ? `<p class="text-sm text-secondary"><i class="bi bi-envelope"></i> ${db.email}</p>` : ''}${db.email_contact ? `<p class="text-sm text-secondary"><i class="bi bi-envelope-open"></i> ${db.email_contact}</p>` : ''}</div>` : ''}
-    ${socialLinks.length > 0 ? `<div class="d-flex flex-wrap gap-2 mt-4 pt-4" style="border-top:1px solid var(--border-primary)">${socialLinks.join('')}</div>` : ''}
   `);
 }

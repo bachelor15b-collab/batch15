@@ -2088,6 +2088,8 @@ AppPages._renderMemberCreateForm = function() {
           <div><label class="text-sm fw-medium mb-1">GitHub</label><input type="url" class="form-input" id="mfGithub" placeholder="https://github.com/username"></div>
           <div><label class="text-sm fw-medium mb-1">LinkedIn</label><input type="url" class="form-input" id="mfLinkedin" placeholder="https://linkedin.com/in/username"></div>
           <div><label class="text-sm fw-medium mb-1">Twitter</label><input type="url" class="form-input" id="mfTwitter" placeholder="https://twitter.com/username"></div>
+          <div><label class="text-sm fw-medium mb-1">Facebook</label><input type="url" class="form-input" id="mfFacebook" placeholder="https://facebook.com/username"></div>
+          <div><label class="text-sm fw-medium mb-1">Instagram</label><input type="url" class="form-input" id="mfInstagram" placeholder="https://instagram.com/username"></div>
         </div>
 
         <div class="card-header px-0"><h5 class="card-title">Certificates & Achievements</h5></div>
@@ -2193,6 +2195,8 @@ AppPages._renderMemberProfileForm = function(profile, isAdmin) {
           <div><label class="text-sm fw-medium mb-1">GitHub</label><input type="url" class="form-input" id="mfGithub" value="${s(profile.github)}"></div>
           <div><label class="text-sm fw-medium mb-1">LinkedIn</label><input type="url" class="form-input" id="mfLinkedin" value="${s(profile.linkedin)}"></div>
           <div><label class="text-sm fw-medium mb-1">Twitter</label><input type="url" class="form-input" id="mfTwitter" value="${s(profile.twitter)}"></div>
+          <div><label class="text-sm fw-medium mb-1">Facebook</label><input type="url" class="form-input" id="mfFacebook" value="${s(profile.facebook)}"></div>
+          <div><label class="text-sm fw-medium mb-1">Instagram</label><input type="url" class="form-input" id="mfInstagram" value="${s(profile.instagram)}"></div>
         </div>
 
         <div class="card-header px-0"><h5 class="card-title">Certificates & Achievements</h5></div>
@@ -2261,6 +2265,8 @@ AppPages._initMemberForm = function(profile, isAdmin) {
       github: getVal('mfGithub') || null,
       linkedin: getVal('mfLinkedin') || null,
       twitter: getVal('mfTwitter') || null,
+      facebook: getVal('mfFacebook') || null,
+      instagram: getVal('mfInstagram') || null,
       certificates: getVal('mfCertificates') || null,
     };
 

@@ -363,6 +363,7 @@ class Api
 
         // ——— Members ———
         self::get('/members',                    ['App\\Controllers\\MemberController', 'index']);
+        self::get('/members/facets',             ['App\\Controllers\\MemberController', 'facets']);
         self::get('/members/{id}',               ['App\\Controllers\\MemberController', 'show']);
         self::post('/members',                   ['App\\Controllers\\MemberController', 'create']);
         self::post('/members/{id}/picture',      ['App\\Controllers\\MemberController', 'uploadPicture']);

@@ -652,14 +652,25 @@ async register(body) {
     return await this._fetch('GET', '/users/claim-status');
   },
 
-  // ---------- Public pages (still use mock data for now -- backend endpoints TBD) ----------
+// ---------- Members directory ----------
   async getMembers(params = {}) {
     const q = new URLSearchParams();
     if (params.page) q.set('page', params.page);
     if (params.per_page) q.set('per_page', params.per_page);
     if (params.status) q.set('status', params.status);
     if (params.search) q.set('search', params.search);
+    if (params.skills) q.set('skills', params.skills);
+    if (params.interests) q.set('interests', params.interests);
+    if (params.language) q.set('language', params.language);
+    if (params.level) q.set('level', params.level);
+    if (params.source) q.set('source', params.source);
+    if (params.has_account !== undefined && params.has_account !== null) q.set('has_account', params.has_account ? '1' : '0');
+    if (params.sort) q.set('sort', params.sort);
     return await this._fetch('GET', '/members?' + q.toString());
+  },
+
+  async getMemberFacets() {
+    return await this._fetch('GET', '/members/facets');
   },
 
   async getMember(id) {
