@@ -1206,4 +1206,38 @@ async function showMemberDetail(id) {
       ${socials ? `<div class="d-flex flex-wrap gap-2 mt-4 pt-4" style="border-top:1px solid var(--border-primary)">${socials}</div>` : ''}
     </div>
   `);
+
+  // SEO: member profile title + ProfilePage structured data while the modal is open
+  const prevTitle = document.title;
+  document.title = name + ' — Jazeera University CS & IT Batch 15';
+  const membersUrl = (window.BASE_URL || '') + '/members';
+  const schemaId = 'seo-profile-page';
+  let schemaEl = document.getElementById(schemaId);
+  if (!schemaEl) {
+    schemaEl = document.createElement('script');
+    schemaEl.type = 'application/ld+json';
+    schemaEl.id = schemaId;
+    document.head.appendChild(schemaEl);
+  }
+  const person = { '@type': 'Person', name: name, url: membersUrl, alumniOf: { '@type': 'CollegeOrUniversity', name: 'Jazeera University' } };
+  if (db.bio) person.description = db.bio;
+  if (skillsArr.length) person.knowsAbout = skillsArr;
+  schemaEl.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ProfilePage', name: name, mainEntity: person });
+
+  const restore = () => {
+    if (restored) return;
+    restored = true;
+    document.title = prevTitle;
+    const s = document.getElementById(schemaId);
+    if (s) s.parentNode.removeChild(s);
+    window.removeEventListener('hashchange', onHash);
+  };
+  let restored = false;
+  const onHash = () => restore();
+  window.addEventListener('hashchange', onHash);
+  const modalContainer = document.getElementById('modal-container');
+  const obs = new MutationObserver(() => {
+    if (!modalContainer.children.length) { restore(); obs.disconnect(); }
+  });
+  obs.observe(modalContainer, { childList: true });
 }

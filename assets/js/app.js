@@ -318,8 +318,8 @@ window.addEventListener('hashchange', () => {
     // Get initial path from hash, or try window location path, or default to /
     let initialPath = window.location.hash.slice(1) || '/';
 
-    // If no hash and user is logged in, try to use URL path as SPA route
-    if (!window.location.hash && user) {
+    // If no hash, use the URL path as the SPA route (clean URLs for guests and members)
+    if (!window.location.hash) {
       const base = window.BASE_URL || '';
       const path = window.location.pathname;
       // Skip if we're on the base URL itself (e.g. /B15/ or /)

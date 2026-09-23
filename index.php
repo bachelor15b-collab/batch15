@@ -7,6 +7,36 @@ function v($path) {
   $full = __DIR__ . '/' . $path;
   return file_exists($full) ? '?v=' . filemtime($full) : '';
 }
+
+// ─── SEO dispatch (robots, sitemap, crawler snapshots) ──────────
+spl_autoload_register(function (string $class) {
+    $prefix = 'App\\';
+    $baseDir = __DIR__ . '/app/';
+    if (str_starts_with($class, $prefix)) {
+        $file = $baseDir . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    }
+});
+
+$__relative = \App\Support\SeoSnapshots::pathRoute();
+if ($__relative === '/robots.txt') {
+    \App\Support\SeoSnapshots::serveRobots();
+}
+if ($__relative === '/sitemap.xml') {
+    \App\Support\SeoSnapshots::serveSitemap();
+}
+$__ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+if ($__ua !== '' && \App\Support\SeoSnapshots::isCrawler($__ua) && \App\Support\SeoSnapshots::isPublicRoute($__relative)) {
+    \App\Support\SeoSnapshots::render($__relative);
+}
+
+// Canonical origin + shared SEO values for the shell document
+$__origin = \App\Support\SeoSnapshots::canonicalOrigin();
+$__base   = \App\Support\SeoSnapshots::basePath();
+$__home   = $__origin . $__base . '/';
+$__ogImg  = $__origin . $__base . '/assets/images/social-preview-1200x630.png';
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,29 +47,44 @@ function v($path) {
   <meta name="author" content="CS Batch 15, Jazeera University">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0f172a">
-  <link rel="canonical" id="canonicalLink" href="">
+  <link rel="canonical" id="canonicalLink" href="<?= htmlspecialchars($__home) ?>">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="CS15 Hub">
   <meta property="og:title" content="CS15 Hub — Jazeera University Computer Science Batch 15">
   <meta property="og:description" content="Jazeera University's portal for CS Batch 15 — courses, projects, messaging, elections, and the official BTCH 15-B Profiling class directory of 58 students.">
-  <meta property="og:url" id="ogUrl" content="">
-  <meta property="og:image" id="ogImage" content="">
+  <meta property="og:url" id="ogUrl" content="<?= htmlspecialchars($__home) ?>">
+  <meta property="og:image" id="ogImage" content="<?= htmlspecialchars($__ogImg) ?>">
+  <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CS15 Hub — Jazeera University Computer Science Batch 15">
   <meta name="twitter:description" content="Jazeera University's portal for CS Batch 15 — courses, projects, messaging, elections, and the official BTCH 15-B Profiling class directory of 58 students.">
-  <meta name="twitter:image" id="twitterImage" content="">
+  <meta name="twitter:image" id="twitterImage" content="<?= htmlspecialchars($__ogImg) ?>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "<?= htmlspecialchars(rtrim($__home, '/')) ?>/#organization",
+    "name": "Jazeera University CS & IT Batch 15",
+    "alternateName": ["CS15 Hub", "CS Batch 15", "BTCH 15-B"],
+    "url": "<?= htmlspecialchars($__home) ?>",
+    "logo": "<?= htmlspecialchars($__ogImg) ?>",
+    "description": "Student-built platform of Jazeera University Computer Science & IT Batch 15 (BTCH 15-B): class directory, projects, gallery, and community tools.",
+    "parentOrganization": {
+      "@type": "EducationalOrganization",
+      "name": "Jazeera University",
+      "address": { "@type": "PostalAddress", "addressCountry": "SO", "addressLocality": "Mogadishu" }
+    }
+  }
+  </script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "<?= htmlspecialchars(rtrim($__home, '/')) ?>/#website",
     "name": "CS15 Hub",
-    "alternateName": "CS Batch 15 Portal",
-    "description": "Jazeera University's Computer Science Batch 15 academic portal.",
-    "publisher": {
-      "@type": "EducationalOrganization",
-      "name": "Jazeera University",
-      "department": "Computer Science"
-    }
+    "url": "<?= htmlspecialchars($__home) ?>",
+    "publisher": { "@id": "<?= htmlspecialchars(rtrim($__home, '/')) ?>/#organization" },
+    "inLanguage": "en"
   }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,29 +98,6 @@ function v($path) {
   <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
   <link rel="manifest" href="favicon_io/site.webmanifest">
-  <script>
-    (function () {
-      function currentCanonical() {
-        var base = window.location.origin + window.location.pathname.replace(/index\.html?$/i, '');
-        var hash = window.location.hash.replace(/^#/, '') || '/';
-        return base + hash;
-      }
-      function applyMeta() {
-        var url = currentCanonical();
-        var img = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'logo.png';
-        var link = document.getElementById('canonicalLink');
-        if (link) link.href = url;
-        var ogUrl = document.getElementById('ogUrl');
-        if (ogUrl) ogUrl.content = url;
-        var ogImage = document.getElementById('ogImage');
-        if (ogImage) ogImage.content = img;
-        var twitterImage = document.getElementById('twitterImage');
-        if (twitterImage) twitterImage.content = img;
-      }
-      applyMeta();
-      window.addEventListener('hashchange', applyMeta);
-    })();
-  </script>
 </head>
 <body>
   <div id="app">
@@ -101,5 +123,6 @@ function v($path) {
   <script src="assets/js/pages-app.js<?= v('assets/js/pages-app.js') ?>"></script>
   <script src="assets/js/quiz-questions.js<?= v('assets/js/quiz-questions.js') ?>"></script>
   <script src="assets/js/app.js<?= v('assets/js/app.js') ?>"></script>
+  <script src="assets/js/seo.js<?= v('assets/js/seo.js') ?>"></script>
 </body>
 </html>
