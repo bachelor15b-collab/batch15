@@ -669,6 +669,10 @@ async register(body) {
     return await this._fetch('GET', '/members?' + q.toString());
   },
 
+  async mineMember() {
+    return await this._fetch('GET', '/members/me');
+  },
+
   async getMemberFacets() {
     return await this._fetch('GET', '/members/facets');
   },

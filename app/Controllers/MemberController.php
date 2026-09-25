@@ -67,6 +67,16 @@ class MemberController
     }
 
     /**
+     * GET /members/me — the caller's own member profile (any status).
+     */
+    public static function mine(): never
+    {
+        $authUser = AuthMiddleware::authenticate();
+        $profile  = MemberProfile::findByUserId($authUser->id);
+        Response::success(['member' => $profile ? $profile->toArray() : null]);
+    }
+
+    /**
      * GET /members/facets — distinct filter values for the directory UI
      */
     public static function facets(): never

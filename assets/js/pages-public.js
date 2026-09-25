@@ -829,6 +829,8 @@ const PublicPages = {
               <div class="d-flex gap-2 flex-wrap justify-center" id="dirHeroStats"></div>
             </div>
 
+            <div id="memberCardCta"></div>
+
             <div class="card directory-toolbar p-4">
               <div class="directory-search-row">
                 <div class="directory-search">
@@ -879,6 +881,7 @@ const PublicPages = {
 
     window._memberDir.sort = 'name';
     await memberFetchAndRender();
+    fillMemberCardCta();
   },
 
   contact() {
@@ -1147,6 +1150,66 @@ function showProjectDetail(id) {
       ${p.demo_url ? `<a href="${p.demo_url}" target="_blank" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-up-right"></i> Live Demo</a>` : ''}
     </div>
   `);
+}
+
+async function fillMemberCardCta() {
+  const host = document.getElementById('memberCardCta');
+  if (!host) return;
+  const user = DB.currentUser || null;
+  const role = ((user && (user.role || user.role_slug)) || '').toLowerCase();
+  if (role.includes('admin') || role.includes('teacher') || role.includes('operations') || role === 'soc_team') {
+    host.style.display = 'none';
+    return;
+  }
+  const card = (inner) => `<div class="card member-card-cta p-4" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px">${inner}</div>`;
+  const nav = (p) => `onclick="router.navigate('${p}')"`;
+
+  if (!user) {
+    host.innerHTML = card(`
+      <div>
+        <div class="fw-bold"><i class="bi bi-person-badge me-2 text-primary"></i>Are you a BTCH 15-B student without a member card? Request yours now.</div>
+        <div class="text-sm text-tertiary mt-1">An admin verifies your request and your card appears on this directory.</div>
+      </div>
+      <button class="btn btn-primary" ${nav('/login')}><i class="bi bi-person-plus"></i> Request Your Member Card</button>`);
+    return;
+  }
+
+  let m = null;
+  try { const res = await API.mineMember(); m = res.member || null; } catch (e) { host.style.display = 'none'; return; }
+
+  if (!m) {
+    host.innerHTML = card(`
+      <div>
+        <div class="fw-bold"><i class="bi bi-person-badge me-2 text-primary"></i>${esc(user.name || user.full_name || 'Hi there')}, you don't have a member card yet.</div>
+        <div class="text-sm text-tertiary mt-1">Create your card — an admin approves it before it goes live.</div>
+      </div>
+      <button class="btn btn-primary" ${nav('/member-profile')}><i class="bi bi-person-plus"></i> Request Your Member Card</button>`);
+    return;
+  }
+  if (m.status === 'pending') {
+    host.innerHTML = card(`
+      <div>
+        <div class="fw-bold"><i class="bi bi-hourglass-split me-2 text-warning"></i>Your card request is under review.</div>
+        <div class="text-sm text-tertiary mt-1">An admin will publish your card to the directory once it's approved.</div>
+      </div>
+      <button class="btn btn-secondary" ${nav('/member-profile')}>View / Edit Request</button>`);
+    return;
+  }
+  if (m.status === 'rejected') {
+    host.innerHTML = card(`
+      <div>
+        <div class="fw-bold text-danger"><i class="bi bi-x-circle me-2"></i>Your card request was declined.</div>
+        <div class="text-sm text-tertiary mt-1">Update your details and re-submit for review.</div>
+      </div>
+      <button class="btn btn-primary" ${nav('/member-profile')}><i class="bi bi-arrow-clockwise"></i> Update & Re-submit</button>`);
+    return;
+  }
+  host.innerHTML = card(`
+    <div>
+      <div class="fw-bold"><i class="bi bi-patch-check me-2 text-success"></i>Your member card is live on this directory.</div>
+      <div class="text-sm text-tertiary mt-1">Edits you make are re-reviewed by an admin.</div>
+    </div>
+    <button class="btn btn-secondary" ${nav('/member-profile')}><i class="bi bi-pencil"></i> Manage My Card</button>`);
 }
 
 async function showMemberDetail(id) {

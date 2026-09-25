@@ -22,6 +22,7 @@ const Dashboards = {
       { title: 'Main', items: [
         { icon: 'bi-house-door', label: 'Website', route: '/' },
         { icon: 'bi-speedometer2', label: 'Dashboard', route: '/dashboard' },
+        { icon: 'bi-person-badge', label: 'My Member Card', route: '/member-profile' },
         { icon: 'bi-info-circle', label: 'About Us', route: '/about' },
         { icon: 'bi-people', label: 'Our Members', route: '/members' },
         { icon: 'bi-images', label: 'Gallery', route: '/gallery' },
@@ -34,6 +35,7 @@ const Dashboards = {
       { title: 'Main', items: [
         { icon: 'bi-house-door', label: 'Website', route: '/' },
         { icon: 'bi-speedometer2', label: 'Overview', route: '/dashboard' },
+        { icon: 'bi-person-badge', label: 'My Member Card', route: '/member-profile' },
         { icon: 'bi-book', label: 'My Courses', route: '/courses' },
         { icon: 'bi-star', label: 'Grades', route: '/grades' },
         { icon: 'bi-trophy', label: 'Leaderboard', route: '/leaderboard' },
@@ -4768,7 +4770,7 @@ function memberDirShell() {
       <div class="d-flex gap-2">
         <span class="badge badge-primary" id="mdStatTotal">-</span>
         <span class="badge badge-success" id="mdStatRoster">-</span>
-        <span class="badge badge-warning" id="mdStatPending">-</span>
+        <button class="badge badge-warning" id="mdStatPending" style="cursor:pointer" onclick="memberDirGotoPending()" title="Show pending requests">-</button>
         <span class="badge badge-info" id="mdStatVerified">-</span>
         <button class="btn btn-sm btn-ghost" onclick="loadMemberDirectory()" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
         <button class="btn btn-primary btn-sm" onclick="memberDirEdit()"><i class="bi bi-person-plus"></i> Add member</button>
@@ -4902,6 +4904,19 @@ function mdGradient(name) {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
   return palettes[h % palettes.length];
+}
+
+function memberDirGotoPending() {
+  switchSuperAdminPanel('members');
+  setTimeout(() => {
+    const sel = document.getElementById('memberDirStatus');
+    if (sel) {
+      sel.value = 'pending';
+      _memberDir.status = 'pending';
+      _memberDir.page = 1;
+      memberDirRefresh();
+    }
+  }, 80);
 }
 
 function memberDirEdit(id) {
