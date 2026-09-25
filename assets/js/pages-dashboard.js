@@ -4947,7 +4947,10 @@ function memberDirEdit(id) {
         <div class="form-group" style="grid-column:1/-1"><label class="form-label">Picture (JPG/PNG/WebP, max 2MB)</label><input type="file" class="form-input" id="mdPicture" accept="image/jpeg,image/png,image/gif,image/webp"></div>
         <input type="hidden" id="mdHiddenId" value="${m ? m.id : ''}">
       </div>`;
-    UI.showModal((m ? 'Edit member' : 'Add member'), body);
+    const footer = `
+      <button class="btn btn-secondary" onclick="UI.closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="memberDirSave()"><i class="bi bi-check-lg"></i> ${m ? 'Save Changes' : 'Add Member'}</button>`;
+    UI.showModal((m ? 'Edit member' : 'Add member'), body, footer);
   };
   if (id) {
     API.getMember(id).then(r => modal(r.member || r)).catch(e => UI.showToast('Error', e.message || 'Failed to load member', 'error'));
