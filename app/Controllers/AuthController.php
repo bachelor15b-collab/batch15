@@ -170,10 +170,13 @@ class AuthController
         $state = $_GET['state'] ?? null;
         $error = $_GET['error'] ?? null;
 
-        // Determine the frontend base URL (include base path for subdirectory installs e.g. /B15)
+        // Determine the frontend base URL (include base path for subdirectory installs e.g. /B15).
+        // SCRIPT_NAME is .../api/index.php during the callback, so strip the trailing /api
+        // to point redirects at the SPA root rather than the API entry point.
         $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+        $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+        $basePath  = preg_replace('#/api$#', '', $scriptDir);
         $baseUrl = $scheme . '://' . $host . $basePath;
 
         if ($error) {
