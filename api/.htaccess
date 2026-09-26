@@ -1,8 +1,0 @@
-RewriteEngine On
-
-# Ensure requests are not for real files
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# Route everything to index.php
-RewriteRule ^(.*)$ index.php [QSA,L]
